@@ -8,10 +8,10 @@ services:
     ports:
       - 8000:80
     depends_on:
-      - postgres-db
+      - db
 
-  postgres-db:
-    image: postgres:latest
+  db:
+    image: postgres:16.4
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
