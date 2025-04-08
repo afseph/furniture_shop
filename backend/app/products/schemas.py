@@ -15,3 +15,7 @@ class SProducts(BaseModel):
 
 class SCategoryADD(BaseModel):
     name: str = Field(..., description="Название категории.")
+
+class SCategoryUPDATE(BaseModel):
+    id: int = Field(..., description="ID Категории")
+    name: str = Field(..., description='Название категории')

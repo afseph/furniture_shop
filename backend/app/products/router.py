@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.database import async_session_maker 
 
 from app.products.models import Product, Category
-from app.products.schemas import SProducts, SCategoryADD
+from app.products.schemas import SProducts, SCategoryADD, SCategoryUPDATE
 from app.products.dao import ProductDAO, CategoryDAO
 from app.products.rb import RBProduct
 
@@ -28,3 +28,13 @@ async def add_category(category: SCategoryADD) -> dict:
                 'category':category}
     else:
         return {'message':'Ошибка при добавлении категории!'}
+    
+@router.put('/category/update/')
+async def update_category(category: SCategoryUPDATE) -> dict:
+    check = await CategoryDAO.update(filter_by={'id':category.id},
+                                    name=category.name)
+    if check:
+        return {'message':'Название категории обновленно!', 
+                'category':category}
+    else:
+        return {'message':'Ошибка при обновлении названия категории!'}
