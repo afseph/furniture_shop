@@ -21,6 +21,14 @@ class Product(Base):
     def __repr__(self):
         return str(self)
 
+    def to_dict(self):
+        return{
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'category_id': self.category_id
+        }
+
 class Category(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
