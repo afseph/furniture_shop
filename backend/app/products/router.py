@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.database import async_session_maker 
 
 from app.products.models import Product, Category
-from app.products.schemas import SProducts
+from app.products.schemas import SProducts, SCategoryADD
 from app.products.dao import ProductDAO, CategoryDAO
 from app.products.rb import RBProduct
 
@@ -19,3 +19,12 @@ async def get_product_by_id(product_id: int) -> SProducts | None:
     if rez is None:
         return {'message': f'Студент с ID {product_id} не найден!'}
     return rez
+
+@router.post('/category/add/')
+async def add_category(category: SCategoryADD) -> dict:
+    check = await CategoryDAO.add(**category.dict())
+    if check:
+        return {'message':'Категория успешно добавленна!', 
+                'category':category}
+    else:
+        return {'message':'Ошибка при добавлении категории!'}
