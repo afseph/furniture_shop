@@ -13,6 +13,12 @@ class SProducts(BaseModel):
                             description="Описание товара.")
     
 
+class SCategory(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str = Field(..., description="Название категории.")
+
 class SCategoryADD(BaseModel):
     name: str = Field(..., description="Название категории.")
 
