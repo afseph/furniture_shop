@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: ./backend
-    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 80
+    command: uvicorn app.main:app --host 0.0.0.0 --port 80
     ports:
       - 8000:80
     depends_on:
@@ -18,7 +18,7 @@ services:
       POSTGRES_DB: fast_api_db
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
 

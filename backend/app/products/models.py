@@ -11,7 +11,7 @@ class Product(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey('categorys.id'), 
                                             nullable=False)
 
-    category: Mapped['Category'] = relationship('Major', 
+    category: Mapped['Category'] = relationship('Category', 
                                                 back_populates='products')
     
     def __str__(self):
@@ -24,6 +24,9 @@ class Product(Base):
 class Category(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
+
+    products: Mapped['Product'] = relationship("Product", 
+                                            back_populates="category")
 
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, name={self.name!r})"
