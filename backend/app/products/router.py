@@ -10,7 +10,7 @@ from app.products.rb import RBProduct
 
 router = APIRouter(prefix='/products', tags=['Products endpoints'])
 
-@router.get('/', summary="Получить все товары")
+@router.get('/all/', summary="Получить все товары")
 async def get_all_products(request_body: RBProduct = Depends()) -> list[SProducts]:
     return await ProductDAO.get_all_full_data(**request_body.to_dict())
 

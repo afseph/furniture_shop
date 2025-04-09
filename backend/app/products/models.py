@@ -14,6 +14,9 @@ class Product(Base):
     category: Mapped['Category'] = relationship('Category', 
                                                 back_populates='products')
     
+    product_types: Mapped['ProductType'] = relationship('ProductType',
+                                                        back_populates='product')
+    
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "
                 f"title={self.title!r}")
@@ -41,3 +44,27 @@ class Category(Base):
     
     def __repr__(self):
         return str(self)
+    
+class ProductType(Base):
+    art: Mapped[int_pk]
+    amount: Mapped[int]
+    price: Mapped[float]
+
+    product_id: Mapped[int] = mapped_column('products.id', nullable=False)
+
+    product: Mapped['Product'] = relationship('Product', 
+                                            back_populates='product_types')
+    
+    def __str__(self):
+        return (f"{self.__class__.__name__}(art={self.art}")
+
+    def __repr__(self):
+        return str(self)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'amount':self.amount,
+            'price':self.price,
+            'product_id': self.product_id
+        }
