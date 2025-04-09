@@ -14,8 +14,9 @@ class Product(Base):
     category: Mapped['Category'] = relationship('Category', 
                                                 back_populates='products')
     
-    product_types: Mapped['ProductType'] = relationship('ProductType',
-                                                        back_populates='product')
+    product_types: Mapped[list['ProductType']] = relationship('ProductType',
+                                                        back_populates='product',
+                                                        cascade="all, delete-orphan")
     
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "
@@ -32,6 +33,7 @@ class Product(Base):
             'category_id': self.category_id
         }
 
+
 class Category(Base):
     id: Mapped[int_pk]
     name: Mapped[str_uniq]
@@ -44,13 +46,14 @@ class Category(Base):
     
     def __repr__(self):
         return str(self)
-    
+
+
 class ProductType(Base):
     art: Mapped[int_pk]
     amount: Mapped[int]
     price: Mapped[float]
 
-    product_id: Mapped[int] = mapped_column('products.id', nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
 
     product: Mapped['Product'] = relationship('Product', 
                                             back_populates='product_types')
@@ -63,7 +66,7 @@ class ProductType(Base):
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'art': self.art,
             'amount':self.amount,
             'price':self.price,
             'product_id': self.product_id

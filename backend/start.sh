@@ -5,10 +5,10 @@ while ! nc -z db 5432; do
   sleep 1
 done
 
-echo "БД доступна. Генерируем миграцию."
-# Уникальное имя ревизии по дате
-REVISION_MSG="auto_$(date +%Y%m%d_%H%M%S)"
-alembic revision --autogenerate -m "$REVISION_MSG"
+# echo "БД доступна. Генерируем миграцию."
+# # Уникальное имя ревизии по дате
+# REVISION_MSG="auto_$(date +%Y%m%d_%H%M%S)"
+# alembic revision --autogenerate -m "$REVISION_MSG"
 
 echo "Применяем миграции."
 alembic upgrade head
