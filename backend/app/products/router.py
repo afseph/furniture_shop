@@ -29,6 +29,14 @@ async def add_product(product: SProductADD):
                 'product': product}
     else:
         return {'message':'Ошибка при добавлении товарной группы!'}
+    
+@router.delete('/delete/{product_id}')
+async def delete_product(product_id: int) -> dict:
+    check = await ProductDAO.delete(id = product_id)
+    if check:
+        return {'message':f'Товарная группа с ID {product_id} успешно удаленна!'}
+    else:
+        return {'message':f'Ошибка при удалении товарной группы с ID {product_id}'}
 
 @router.get('/categories/')
 async def get_all_categories() -> list[SCategory]:
