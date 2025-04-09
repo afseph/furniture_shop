@@ -4,7 +4,9 @@ from app.database import async_session_maker
 
 from app.products.models import Product, Category
 from app.products.schemas import (SProducts, SCategoryADD, SCategoryUPDATE, 
-                                SCategory, SProductADD, SProductTypeADD)
+                                SCategory, SProductADD, SProductTypeADD,
+                                SProductTypeUPDATEprice, SProductTypeUPDATEamount,
+                                SProductTypeUPDATEproduct)
 from app.products.dao import ProductDAO, CategoryDAO, ProductTypeDAO
 from app.products.rb import RBProduct
 
@@ -34,6 +36,51 @@ async def add_product_type(producttype: SProductTypeADD) -> dict:
                 'product': producttype}
     else:
         return {'message':'Ошибка при добалении товара!'}
+
+
+@router.put('/types/amount/update/', summary='Изменение остатоков товара.', tags=['Product Types'])
+async def update_product_type_amount(producttype: SProductTypeUPDATEamount) -> dict:
+    check = await ProductTypeDAO.update(filter_by={'art':producttype.art},
+                                        amount=producttype.amount)
+    if check:
+        return {'message':'Остаток товара успешно обновлен!',
+                'art':producttype.art,
+                'remains':producttype.amount}
+    else:
+        return {
+                'message':
+                f'Ошибка при обновлении остатоков товара с артикулом {producttype.art}'
+                }
+
+
+@router.put('/types/price/update/', summary='Изменение цены товара.', tags=['Product Types'])
+async def update_product_type_price(producttype: SProductTypeUPDATEprice) -> dict:
+    check = await ProductTypeDAO.update(filter_by={'art':producttype.art},
+                                        price=producttype.price)
+    if check:
+        return {'message':'Цена товара успешно обновлена!',
+                'art':producttype.art,
+                'price':producttype.price}
+    else:
+        return {
+                'message':
+                f'Ошибка при обновлении цены товара с артикулом {producttype.art}'
+                }
+
+
+@router.put('/types/product/update/', summary='Изменение товарной группы товара.', tags=['Product Types'])
+async def update_product_type_product(producttype: SProductTypeUPDATEproduct) -> dict:
+    check = await ProductTypeDAO.update(filter_by={'art':producttype.art},
+                                        product_id=producttype.product_id)
+    if check:
+        return {'message':'Товарная группа товара успешно обновлена!',
+                'art':producttype.art,
+                'product_id':producttype.product_id}
+    else:
+        return {
+                'message':
+                f'Ошибка при обновлении товарной группы товара с артикулом {producttype.art}'
+                }
 
 
 @router.delete('/types/delete/{type_art}', tags=['Product Types'])

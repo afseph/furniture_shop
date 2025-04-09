@@ -29,14 +29,32 @@ class SProductTypeADD(BaseModel):
     price: float = Field(..., description="Цена товара")
     product_id: int = Field(..., description="ID товарной группы")
 
+
+class SProductTypeUPDATEamount(BaseModel):
+    art: int = Field(..., description="Артикул товара")
+    amount: int = Field(..., description="Остаток")
+
+
+class SProductTypeUPDATEprice(BaseModel):
+    art: int = Field(..., description="Артикул товара")
+    price: float = Field(..., description="Цена товара")
+
+
+class SProductTypeUPDATEproduct(BaseModel):
+    art: int = Field(..., description="Артикул товара")
+    product_id: int = Field(..., description="ID товарной группы")
+
+
 class SCategory(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     name: str = Field(..., description="Название категории.")
 
+
 class SCategoryADD(BaseModel):
     name: str = Field(..., description="Название категории.")
+
 
 class SCategoryUPDATE(BaseModel):
     id: int = Field(..., description="ID Категории")

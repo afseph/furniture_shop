@@ -22,7 +22,7 @@ app = FastAPI(openapi_tags=tags_metadata)
 
 @app.get("/")
 def home_page():
-    return {"message": "Привет, Хабр!"}
+    return {"message": "Hello WRLD!"}
 
 
 app.include_router(router_students)
