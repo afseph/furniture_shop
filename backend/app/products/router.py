@@ -27,13 +27,22 @@ async def get_all_product_types():
 
 
 @router.post('/types/add/', tags=['Product Types'])
-async def add_product_type(producttype: SProductTypeADD):
+async def add_product_type(producttype: SProductTypeADD) -> dict:
     check = await ProductTypeDAO.add_product_type(**producttype.dict())
     if check:
         return {'message':'Товар успешно добавлен!',
                 'product': producttype}
     else:
         return {'message':'Ошибка при добалении товара!'}
+
+
+@router.delete('/types/delete/{type_art}', tags=['Product Types'])
+async def delete_product_type(type_art: int) -> dict:
+    check = await ProductTypeDAO.delete(art=type_art)
+    if check:
+        return {'message':f'Товар с артикулом {type_art} успешно удален!'}
+    else:
+        return {'message':f'Ошибка при удалении товара с артикулом {type_art}'}
 
 
 @router.post('/add/', tags=['Product Groups'])
