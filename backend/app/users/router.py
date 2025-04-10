@@ -33,7 +33,7 @@ async def auth_user(response: Response, user_data: SUserAuth):
                             detail='Неверная почта или пароль')
     access_token = create_access_token({"sub": str(check.id)})
     response.set_cookie(key="users_access_token", value=access_token, httponly=True)
-    return {'access_token': access_token, 'refresh_token': None}
+    return {'access_token': access_token, 'refresh_token': None, 'message':'Авторизация успешно выполнена!'}
 
 
 @router.get("/me/")
