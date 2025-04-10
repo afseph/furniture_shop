@@ -14,6 +14,10 @@ tags_metadata = [
     {
         'name':'Categories',
         'description':'Секция отвечающая за категории.'
+    },
+    {
+        'name':'Product Characteristics',
+        'description':'Секция отвечающая за характеристики товаров.'
     }
 ]
 

@@ -1,7 +1,13 @@
-from sqlalchemy import ForeignKey, text, Text
+from sqlalchemy import ForeignKey, text, Text, Table, Column, Integer
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
+
+characteristic_producttype = Table('charsproducttyperelation', Base.metadata,
+            Column('char_id', Integer, ForeignKey('characteristics.id')),
+            Column('producttype_art', Integer, ForeignKey('producttypes.art'))
+                                )
+
 
 class Product(Base):
     id: Mapped[int_pk]
@@ -20,7 +26,7 @@ class Product(Base):
     
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "
-                f"title={self.title!r}")
+                f"title={self.title!r})")
     
     def __repr__(self):
         return str(self)
@@ -58,8 +64,12 @@ class ProductType(Base):
     product: Mapped['Product'] = relationship('Product', 
                                             back_populates='product_types')
     
+    characteristics = relationship('Characteristic',
+                                                            back_populates='producttype',
+                                                            secondary='charsproducttyperelation')
+    
     def __str__(self):
-        return (f"{self.__class__.__name__}(art={self.art}")
+        return (f"{self.__class__.__name__}(art={self.art})")
 
     def __repr__(self):
         return str(self)
@@ -71,3 +81,19 @@ class ProductType(Base):
             'price':self.price,
             'product_id': self.product_id
         }
+
+
+class Characteristic(Base):
+    id: Mapped[int_pk]
+    name: Mapped[str]
+    value: Mapped[str]
+
+    producttype = relationship('ProductType',
+                                                    back_populates='characteristics',
+                                                    secondary='charsproducttyperelation')
+
+    def __str__(self):
+        return (f"{self.__class__.__name__}(id={self.id})")
+
+    def __repr__(self):
+        return str(self)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select 
 from app.database import async_session_maker 
 
@@ -6,26 +6,44 @@ from app.products.models import Product, Category
 from app.products.schemas import (SProducts, SCategoryADD, SCategoryUPDATE, 
                                 SCategory, SProductADD, SProductTypeADD,
                                 SProductTypeUPDATEprice, SProductTypeUPDATEamount,
-                                SProductTypeUPDATEproduct)
-from app.products.dao import ProductDAO, CategoryDAO, ProductTypeDAO
-from app.products.rb import RBProduct
+                                SProductTypeUPDATEproduct, SCharacterisricsADD,
+                                SCharacteristicBINDINGdata, SCharacteristic)
+from app.products.dao import ProductDAO, CategoryDAO, ProductTypeDAO, CharacteristicDAO
+from app.products.rb import RBProduct, RBCharacteristic
 
 router = APIRouter(prefix='/products')
+
+# ! PRODUCT GROUPS SECTION
 
 @router.get('/all/', summary="Получить все товары", tags=["Product Groups"])
 async def get_all_products(request_body: RBProduct = Depends()) -> list[SProducts]:
     return await ProductDAO.find_full_data(**request_body.to_dict())
 
-# @router.get("/{id}", summary="Получить одного студента по id")
-# async def get_product_by_id(product_id: int) -> SProducts | None:
-#     rez = await ProductDAO.find_one_or_none_by_id(product_id)
-#     if rez is None:
-#         return {'message': f'Товар с ID {product_id} не найден!'}
-#     return rez
+
+@router.post('/add/', tags=['Product Groups'])
+async def add_product(product: SProductADD):
+    check = await ProductDAO.add_product(**product.dict())
+    if check:
+        return {'message':'Товарная группа успешно добавленна!', 
+                'product': product}
+    else:
+        return {'message':'Ошибка при добавлении товарной группы!'}
+
+
+@router.delete('/delete/{product_id}', tags=['Product Groups'])
+async def delete_product(product_id: int) -> dict:
+    check = await ProductDAO.delete(id = product_id)
+    if check:
+        return {'message':f'Товарная группа с ID {product_id} успешно удаленна!'}
+    else:
+        return {'message':f'Ошибка при удалении товарной группы с ID {product_id}'}
+
+
+# ! PRODUCT TYPES SECTION
 
 @router.get('/types/all/', tags = ['Product Types'])
 async def get_all_product_types():
-    return await ProductTypeDAO.get_all()
+    return await ProductTypeDAO.get_all_full_data()
 
 
 @router.post('/types/add/', tags=['Product Types'])
@@ -92,24 +110,63 @@ async def delete_product_type(type_art: int) -> dict:
         return {'message':f'Ошибка при удалении товара с артикулом {type_art}'}
 
 
-@router.post('/add/', tags=['Product Groups'])
-async def add_product(product: SProductADD):
-    check = await ProductDAO.add_product(**product.dict())
+# !PRODUCT CHARACTERISTICS SECTION
+
+@router.get('/characteristic/all/', tags=['Product Characteristics'])
+async def get_all_chars(request_body: RBCharacteristic = Depends()) -> list[SCharacteristic]:
+    return await CharacteristicDAO.get_all(**request_body.to_dict())
+
+
+@router.post('/characteristic/add/', tags=['Product Characteristics'])
+async def add_characteristic(characterisctic: SCharacterisricsADD)->dict:
+    check = await CharacteristicDAO.add_and_bind_to_producttype(**characterisctic.dict())
+    print(check)
     if check:
-        return {'message':'Товарная группа успешно добавленна!', 
-                'product': product}
+        return {'message':'Характеристика успешно добавленна!', 
+                'characteristic':characterisctic,
+                }
     else:
-        return {'message':'Ошибка при добавлении товарной группы!'}
+        return {'message':'Ошибка при добавлении хакартеристики!'}
 
 
-@router.delete('/delete/{product_id}', tags=['Product Groups'])
-async def delete_product(product_id: int) -> dict:
-    check = await ProductDAO.delete(id = product_id)
+@router.put('/characteristic/unbind/', tags=['Product Characteristics'])
+async def unbind_characteristic(unbind_data:SCharacteristicBINDINGdata):
+    check = await CharacteristicDAO.unbind_from_producttype(**unbind_data.dict())
     if check:
-        return {'message':f'Товарная группа с ID {product_id} успешно удаленна!'}
+        return {'message':
+                f'Характеристика с ID {unbind_data.characteristic_id} успешно отвязана!',
+                'dev_data':unbind_data}
     else:
-        return {'message':f'Ошибка при удалении товарной группы с ID {product_id}'}
+        return {'message':'Ошибка при отвязке характеристики!',
+                'dev_data':unbind_data}
 
+
+@router.put('/characteristic/bind/', tags=['Product Characteristics'])
+async def bind_characteristic(unbind_data:SCharacteristicBINDINGdata):
+    check = await CharacteristicDAO.bind_to_producttype(**unbind_data.dict())
+    if check.get('status') is not None:
+        return {'message':
+                f'Характеристика с ID {unbind_data.characteristic_id} уже привязанна!',
+                'dev_data':check}
+    elif check:
+        return {'message':
+                f'Характеристика с ID {unbind_data.characteristic_id} успешно привязанна!',
+                'dev_data':check}
+    else:
+        return {'message':'Ошибка при привязке характеристики!',
+                'dev_data':unbind_data}
+
+
+@router.delete("/characteristics/delete/{characteristic_id}", tags=['Product Characteristics'])
+async def delete_characteristic(characteristic_id: int):
+    try:
+        result = await CharacteristicDAO.delete_characteristic(characteristic_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+# ! CATEGORY SECTION
 
 @router.get('/categories/', tags=['Categories'])
 async def get_all_categories() -> list[SCategory]:

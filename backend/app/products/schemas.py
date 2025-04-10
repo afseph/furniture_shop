@@ -45,6 +45,30 @@ class SProductTypeUPDATEproduct(BaseModel):
     product_id: int = Field(..., description="ID товарной группы")
 
 
+class SCharacterisricsADD(BaseModel):
+    name: str = Field(..., description='Название характеристики')
+    value: str = Field(..., description='Значение характеристики')
+    producttype_art: int = Field(..., description="Артикул товара")
+
+
+class SCharacteristic(BaseModel):
+    id: int = Field(..., description='ID характеристики')
+    name: str = Field(..., description='Название характеристики')
+    value: str = Field(..., description='Значение характеристики')
+
+
+class SCharacteristicBINDINGdata(BaseModel):
+    producttype_art: int = Field(..., description='Артикул товара')
+    characteristic_id: int = Field(..., description='ID Характеристики')
+
+class SProductType(BaseModel):
+    art: int = Field(..., description="Артикул товара")
+    amount: int = Field(..., description="Остаток")
+    price: float = Field(..., description="Цена товара")
+    product_id: int = Field(..., description="ID товарной группы")
+    characteristics: list[SCharacteristic]
+
+
 class SCategory(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
