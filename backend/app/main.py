@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.products.router import router as router_students
+from app.users.router import router as router_users
 
 
 tags_metadata = [
@@ -28,5 +29,5 @@ app = FastAPI(openapi_tags=tags_metadata)
 def home_page():
     return {"message": "Hello WRLD!"}
 
-
+app.include_router(router_users)
 app.include_router(router_students)
