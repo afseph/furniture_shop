@@ -10,23 +10,51 @@ from app.database import async_session_maker
 class ProductDAO(BaseDAO):
     model = Product
         
+    from sqlalchemy.orm import joinedload
+from sqlalchemy import select
+
+class ProductDAO(BaseDAO):
+    model = Product
+
     @classmethod
     async def get_all_full_data(cls, **filter_by):
         async with async_session_maker() as session:
-            # Запрос для получения всех товаров с информацией о категориях
-            query = select(cls.model).options(joinedload(cls.model.category)).filter_by(**filter_by)
+            # Запрос для получения всех товаров с информацией о категориях и типах продуктов
+            query = (
+                select(cls.model)
+                .options(
+                    joinedload(cls.model.category),  # Загружаем категорию через атрибут класса
+                    joinedload(cls.model.product_types).joinedload(ProductType.characteristics)  # Загружаем характеристики для каждого типа продукта
+                )
+                .filter_by(**filter_by)
+            )
             result = await session.execute(query)
-            products_info = result.scalars().all()
+            products_info = result.unique().scalars().all()
 
             # Если товары не найдены, возвращаем пустой список
             if not products_info:
                 return []
 
-            # Преобразуем каждый товар в словарь и добавляем данные категории
+            # Преобразуем каждый товар в словарь и добавляем данные категории и характеристики
             products_data = []
             for product_info in products_info:
                 product_data = product_info.to_dict()
-                product_data['category'] = product_info.category.name  # Используем категорию
+                product_data['category'] = product_info.category.name  # Добавляем категорию
+
+                # Добавляем типы продуктов с характеристиками
+                product_data['product_types'] = []
+                for product_type in product_info.product_types:
+                    product_type_data = product_type.to_dict()  # Преобразуем тип продукта в словарь
+                    product_type_data['characteristics'] = [
+                        {
+                            'id': characteristic.id,
+                            'name': characteristic.name,
+                            'value': characteristic.value
+                        }
+                        for characteristic in product_type.characteristics  # Добавляем характеристики типа продукта
+                    ]
+                    product_data['product_types'].append(product_type_data)
+
                 products_data.append(product_data)
 
             return products_data

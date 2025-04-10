@@ -7,7 +7,8 @@ from app.products.schemas import (SProducts, SCategoryADD, SCategoryUPDATE,
                                 SCategory, SProductADD, SProductTypeADD,
                                 SProductTypeUPDATEprice, SProductTypeUPDATEamount,
                                 SProductTypeUPDATEproduct, SCharacterisricsADD,
-                                SCharacteristicBINDINGdata, SCharacteristic)
+                                SCharacteristicBINDINGdata, SCharacteristic, 
+                                SProductResponse)
 from app.products.dao import ProductDAO, CategoryDAO, ProductTypeDAO, CharacteristicDAO
 from app.products.rb import RBProduct, RBCharacteristic
 
@@ -16,8 +17,8 @@ router = APIRouter(prefix='/products')
 # ! PRODUCT GROUPS SECTION
 
 @router.get('/all/', summary="Получить все товары.", tags=["Product Groups"])
-async def get_all_products(request_body: RBProduct = Depends()) -> list[SProducts]:
-    return await ProductDAO.find_full_data(**request_body.to_dict())
+async def get_all_products(request_body: RBProduct = Depends()) -> list[SProductResponse]:
+    return await ProductDAO.get_all_full_data(**request_body.to_dict())
 
 
 @router.post('/add/', summary='Добавление товарной группы.', tags=['Product Groups'])

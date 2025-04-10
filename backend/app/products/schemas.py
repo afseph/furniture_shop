@@ -83,3 +83,29 @@ class SCategoryADD(BaseModel):
 class SCategoryUPDATE(BaseModel):
     id: int = Field(..., description="ID Категории")
     name: str = Field(..., description='Название категории')
+
+
+class CharacteristicResponse(BaseModel):
+    id: int
+    name: str
+    value: str
+
+class ProductTypeResponse(BaseModel):
+    art: int
+    amount: int
+    price: float
+    characteristics: list[CharacteristicResponse]
+
+class CategoryResponse(BaseModel):
+    name: str
+
+class SProductResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    category_id: int
+    category: str
+    product_types: list[ProductTypeResponse]
+
+    class Config:
+        orm_mode = True
