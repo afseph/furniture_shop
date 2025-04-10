@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.products.router import router as router_students
 from app.users.router import router as router_users
+from app.pages.router import router as router_pages
 
 
 tags_metadata = [
@@ -31,3 +32,4 @@ def home_page():
 
 app.include_router(router_users)
 app.include_router(router_students)
+app.include_router(router_pages)
