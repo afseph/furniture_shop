@@ -15,12 +15,12 @@ router = APIRouter(prefix='/products')
 
 # ! PRODUCT GROUPS SECTION
 
-@router.get('/all/', summary="Получить все товары", tags=["Product Groups"])
+@router.get('/all/', summary="Получить все товары.", tags=["Product Groups"])
 async def get_all_products(request_body: RBProduct = Depends()) -> list[SProducts]:
     return await ProductDAO.find_full_data(**request_body.to_dict())
 
 
-@router.post('/add/', tags=['Product Groups'])
+@router.post('/add/', summary='Добавление товарной группы.', tags=['Product Groups'])
 async def add_product(product: SProductADD):
     check = await ProductDAO.add_product(**product.dict())
     if check:
@@ -30,7 +30,7 @@ async def add_product(product: SProductADD):
         return {'message':'Ошибка при добавлении товарной группы!'}
 
 
-@router.delete('/delete/{product_id}', tags=['Product Groups'])
+@router.delete('/delete/{product_id}',summary='Удаление товарной группы.', tags=['Product Groups'])
 async def delete_product(product_id: int) -> dict:
     check = await ProductDAO.delete(id = product_id)
     if check:
@@ -41,12 +41,12 @@ async def delete_product(product_id: int) -> dict:
 
 # ! PRODUCT TYPES SECTION
 
-@router.get('/types/all/', tags = ['Product Types'])
+@router.get('/types/all/',summary='Получение всех товаров.', tags = ['Product Types'])
 async def get_all_product_types():
     return await ProductTypeDAO.get_all_full_data()
 
 
-@router.post('/types/add/', tags=['Product Types'])
+@router.post('/types/add/',summary='Создание товара.', tags=['Product Types'])
 async def add_product_type(producttype: SProductTypeADD) -> dict:
     check = await ProductTypeDAO.add_product_type(**producttype.dict())
     if check:
@@ -101,7 +101,7 @@ async def update_product_type_product(producttype: SProductTypeUPDATEproduct) ->
                 }
 
 
-@router.delete('/types/delete/{type_art}', tags=['Product Types'])
+@router.delete('/types/delete/{type_art}',summary='Удаление товара.' ,tags=['Product Types'])
 async def delete_product_type(type_art: int) -> dict:
     check = await ProductTypeDAO.delete(art=type_art)
     if check:
@@ -112,12 +112,12 @@ async def delete_product_type(type_art: int) -> dict:
 
 # !PRODUCT CHARACTERISTICS SECTION
 
-@router.get('/characteristic/all/', tags=['Product Characteristics'])
+@router.get('/characteristic/all/',summary='Получение всех добавленных характеристик.' ,tags=['Product Characteristics'])
 async def get_all_chars(request_body: RBCharacteristic = Depends()) -> list[SCharacteristic]:
     return await CharacteristicDAO.get_all(**request_body.to_dict())
 
 
-@router.post('/characteristic/add/', tags=['Product Characteristics'])
+@router.post('/characteristic/add/',summary='Создание характеристики товара.' ,tags=['Product Characteristics'])
 async def add_characteristic(characterisctic: SCharacterisricsADD)->dict:
     check = await CharacteristicDAO.add_and_bind_to_producttype(**characterisctic.dict())
     print(check)
@@ -129,7 +129,7 @@ async def add_characteristic(characterisctic: SCharacterisricsADD)->dict:
         return {'message':'Ошибка при добавлении хакартеристики!'}
 
 
-@router.put('/characteristic/unbind/', tags=['Product Characteristics'])
+@router.put('/characteristic/unbind/',summary='Отвязка характеристики от товара.' ,tags=['Product Characteristics'])
 async def unbind_characteristic(unbind_data:SCharacteristicBINDINGdata):
     check = await CharacteristicDAO.unbind_from_producttype(**unbind_data.dict())
     if check:
@@ -141,7 +141,7 @@ async def unbind_characteristic(unbind_data:SCharacteristicBINDINGdata):
                 'dev_data':unbind_data}
 
 
-@router.put('/characteristic/bind/', tags=['Product Characteristics'])
+@router.put('/characteristic/bind/',summary='Привязка характеристики к товару.' ,tags=['Product Characteristics'])
 async def bind_characteristic(unbind_data:SCharacteristicBINDINGdata):
     check = await CharacteristicDAO.bind_to_producttype(**unbind_data.dict())
     if check.get('status') is not None:
@@ -157,7 +157,7 @@ async def bind_characteristic(unbind_data:SCharacteristicBINDINGdata):
                 'dev_data':unbind_data}
 
 
-@router.delete("/characteristics/delete/{characteristic_id}", tags=['Product Characteristics'])
+@router.delete("/characteristics/delete/{characteristic_id}",summary='Удаление характеристики.' ,tags=['Product Characteristics'])
 async def delete_characteristic(characteristic_id: int):
     try:
         result = await CharacteristicDAO.delete_characteristic(characteristic_id)
@@ -168,12 +168,12 @@ async def delete_characteristic(characteristic_id: int):
 
 # ! CATEGORY SECTION
 
-@router.get('/categories/', tags=['Categories'])
+@router.get('/categories/',summary='Получение всех существующих категорий.' ,tags=['Categories'])
 async def get_all_categories() -> list[SCategory]:
     return await CategoryDAO.get_all()
 
 
-@router.post('/category/add/', tags=['Categories'])
+@router.post('/category/add/',summary='Создание категории.' ,tags=['Categories'])
 async def add_category(category: SCategoryADD) -> dict:
     check = await CategoryDAO.add(**category.dict())
     if check:
@@ -183,7 +183,7 @@ async def add_category(category: SCategoryADD) -> dict:
         return {'message':'Ошибка при добавлении категории!'}
 
 
-@router.put('/category/update/', tags=['Categories'])
+@router.put('/category/update/',summary='Изменение названия категории.' ,tags=['Categories'])
 async def update_category(category: SCategoryUPDATE) -> dict:
     check = await CategoryDAO.update(filter_by={'id':category.id},
                                     name=category.name)
@@ -194,7 +194,7 @@ async def update_category(category: SCategoryUPDATE) -> dict:
         return {'message':'Ошибка при обновлении названия категории!'}
 
 
-@router.delete("/delete/{category_id}", tags=['Categories'])
+@router.delete("/delete/{category_id}",summary='Удаление категории.' ,tags=['Categories'])
 async def delete_category(category_id: int) -> dict:
     check = await CategoryDAO.delete(id=category_id)
     if check:
