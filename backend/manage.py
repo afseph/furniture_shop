@@ -2,9 +2,13 @@ import asyncio
 import sys
 
 from app.commands.create_superuser import create_superuser
+from app.commands.populate_db import populate_db
+from app.commands.clear_db import clear_db
 
 commands = {
-    'createsuperuser': create_superuser
+    'createsuperuser': create_superuser,
+    'populate_db': populate_db,
+    'clear_db': clear_db
 }
 
 def main():
