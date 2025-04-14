@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
 from app.orders_cart.dao import UserProductItemDAO
-from app.orders_cart.schemas import SOrderItemResponse, SOrderResponse
+from app.orders_cart.schemas import SOrderItemResponse, SOrderResponse, SCartItemResponse
 
 from app.users.dependencies import get_curr_user_id
 
@@ -10,7 +10,7 @@ o_router = APIRouter(prefix='/orders', tags=['Orders'])
 c_router = APIRouter(prefix='/cart', tags=['Cart'])
 
 @c_router.get('/get/')
-async def get_cart(user_id: int = Depends(get_curr_user_id)) -> List[SOrderItemResponse]:
+async def get_cart(user_id: int = Depends(get_curr_user_id)) -> List[SCartItemResponse]:
     return await UserProductItemDAO.get_cart(user_id=user_id)
 
 

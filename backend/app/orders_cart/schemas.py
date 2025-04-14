@@ -4,6 +4,13 @@ from datetime import datetime
 
 from app.products.schemas import SProductType
 
+class SCartItemResponse(BaseModel):
+    id: int
+    user_id: int
+    product_type_art: int
+    quantity: int
+    product_type: SProductType
+
 class SOrderItemResponse(BaseModel):
     product_type_art: int
     quantity: int

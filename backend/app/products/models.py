@@ -79,7 +79,10 @@ class ProductType(Base):
             'art': self.art,
             'amount':self.amount,
             'price':self.price,
-            'product_id': self.product_id
+            'product_id': self.product_id,
+            'characteristics':[
+                {'id':c.id, 'name':c.name, 'value':c.value} for c in self.characteristics
+            ]
         }
 
 

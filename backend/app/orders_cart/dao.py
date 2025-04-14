@@ -6,6 +6,8 @@ from dao.base import BaseDAO
 from app.orders_cart.models import UserProductItem, Order
 from app.database import async_session_maker
 
+from app.products.models import ProductType
+
 class UserProductItemDAO(BaseDAO):
     model = UserProductItem
 
@@ -37,10 +39,13 @@ class UserProductItemDAO(BaseDAO):
     async def get_cart(cls, user_id: int):
         async with async_session_maker() as session:
             result = await session.execute(
-                select(cls.model).options(joinedload(cls.model.product_type))
+                select(cls.model).options(
+                    joinedload(cls.model.product_type)
+                    .joinedload(ProductType.characteristics)
+                    )
                 .where(cls.model.user_id == user_id, cls.model.order_id == None)
             )
-            return [item.to_dict() for item in result.scalars().all()]
+            return [item.to_dict() for item in result.unique().scalars().all()]
 
     @classmethod
     async def remove_from_cart(cls, user_id: int, product_type_art: int):
@@ -96,7 +101,8 @@ class UserProductItemDAO(BaseDAO):
         async with async_session_maker() as session:
             result = await session.execute(
                 select(Order)
-                .options(joinedload(Order.items).joinedload(UserProductItem.product_type))
+                .options(joinedload(Order.items).joinedload(UserProductItem.product_type)
+                         .joinedload(ProductType.characteristics))
                 .where(Order.user_id == user_id)
                 .order_by(Order.created_at.desc())
             )
