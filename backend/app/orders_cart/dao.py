@@ -110,3 +110,18 @@ class UserProductItemDAO(BaseDAO):
             orders = result.unique().scalars().all()
 
             return [order.to_dict() for order in orders]
+        
+    @classmethod
+    async def delete_order(cls, order_id:int, user_id: int):
+        async with async_session_maker() as session:
+            await session.execute(
+                delete(cls.model).where(cls.model.order_id == order_id)
+            )
+
+            await session.execute(
+                delete(Order).where(Order.id==order_id, Order.user_id == user_id)
+            )
+
+            await session.commit()
+
+            return order_id

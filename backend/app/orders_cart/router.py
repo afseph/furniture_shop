@@ -44,3 +44,12 @@ async def create_order(user_id: int = Depends(get_curr_user_id)):
 async def get_curr_user_orders(user_id: int = Depends(get_curr_user_id)
                                ):
     return await UserProductItemDAO.get_user_orders(user_id=user_id)
+
+
+@o_router.delete('/delete/{order_id}')
+async def delete_order_by_id(order_id: int, user_id:int = Depends(get_curr_user_id)):
+    check = await UserProductItemDAO.delete_order(order_id=order_id, user_id=user_id)
+    if check:
+        return {'message':f'Order with ID {order_id} successfully deleted!'}
+    else:
+        return {'message':f'Error while deleting order with ID {order_id}'}
