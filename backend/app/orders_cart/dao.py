@@ -85,6 +85,10 @@ class UserProductItemDAO(BaseDAO):
                 item.price_at_order = item.product_type.price
 
             await session.commit()
+            await session.refresh(order)
+
+            # Load items for safety to_dict method usage
+            await session.refresh(order, attribute_names=['items'])
             return order.to_dict()
 
     @classmethod
@@ -96,4 +100,7 @@ class UserProductItemDAO(BaseDAO):
                 .where(Order.user_id == user_id)
                 .order_by(Order.created_at.desc())
             )
-            return [order.to_dict() for order in result.scalars().all()]
+
+            orders = result.unique().scalars().all()
+
+            return [order.to_dict() for order in orders]

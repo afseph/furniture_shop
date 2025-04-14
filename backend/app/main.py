@@ -3,6 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from app.products.router import router as router_students
 from app.users.router import router as router_users
 from app.pages.router import router as router_pages
+from app.orders_cart.router import c_router as router_cart
+from app.orders_cart.router import o_router as router_order
 
 
 tags_metadata = [
@@ -36,3 +38,5 @@ app.mount('/static', StaticFiles(directory='app/static'), 'static')
 app.include_router(router_users)
 app.include_router(router_students)
 app.include_router(router_pages)
+app.include_router(router_cart)
+app.include_router(router_order)

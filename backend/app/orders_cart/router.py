@@ -3,10 +3,8 @@ from typing import List
 from app.orders_cart.dao import UserProductItemDAO
 from app.orders_cart.schemas import SOrderItemResponse, SOrderResponse
 
+from app.users.dependencies import get_curr_user_id
 
-# ! ЗАМЕНИТЬ НА ЗАВИСИМОСТЬ ИЗ МОДУЛЯ AUTH
-def get_curr_user_id():
-    return 1
 
 o_router = APIRouter(prefix='/orders', tags=['Orders'])
 c_router = APIRouter(prefix='/cart', tags=['Cart'])
@@ -26,7 +24,7 @@ async def add_to_cart(product_type_art: int,
     return {'Message':f'Item with art {product_type_art} added to cart!'}
 
 
-@c_router('/remove/')
+@c_router.delete('/remove/')
 async def remove_from_cart(product_type_art: int,
                            user_id: int = Depends(get_curr_user_id)):
     await UserProductItemDAO.remove_from_cart(user_id=user_id,
@@ -44,5 +42,5 @@ async def create_order(user_id: int = Depends(get_curr_user_id)):
 
 @o_router.get('/get/')
 async def get_curr_user_orders(user_id: int = Depends(get_curr_user_id)
-                               ) -> SOrderResponse:
+                               ):
     return await UserProductItemDAO.get_user_orders(user_id=user_id)
