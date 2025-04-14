@@ -15,6 +15,7 @@ sys.path.insert(0, dirname(dirname(abspath(__file__))))
 from app.database import DATABASE_URL, Base
 from app.products.models import Product, Category, ProductType
 from app.users.models import User
+from app.orders_cart.models import UserProductItem, Order
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
