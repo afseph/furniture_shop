@@ -9,7 +9,15 @@ services:
     ports:
       - 8000:80
     depends_on:
-      - db
+      migrator:
+        condition: service_completed_successfully
+
+  migrator:
+    build: ./backend
+    command: "alembic upgrade head"
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:16.4
@@ -22,6 +30,12 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d fast_api_db -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
 volumes:
   pgdata:

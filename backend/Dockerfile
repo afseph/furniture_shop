@@ -5,9 +5,11 @@ RUN apt-get update && apt-get install -y netcat-openbsd
 
 WORKDIR /app
 
-COPY . /app
+COPY requirements.txt /app
 
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+
+COPY . /app
 
 # Установка прав на выполнение комманды
 RUN chmod +x /app/start.sh
