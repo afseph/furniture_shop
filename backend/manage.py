@@ -19,7 +19,7 @@ def main():
     command = sys.argv[1]
     if command not in commands:
         print(f'Неизвестная команда: {command}')
-        print(f'Доступные команды: {', '.join(commands.keys())}')
+        print(f'Доступные команды: {", ".join(commands.keys())}')
         return
     
     asyncio.run(commands[command]())
