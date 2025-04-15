@@ -1,8 +1,16 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {Outlet} from 'react-router-dom'
 import Header from './Header.jsx'
+import { connect } from 'react-redux';
 
-const Layout = () => {
+import { load_user } from '../actions/profile.js';
+
+const Layout = ({ load_user }) => {
+
+    useEffect(() => {
+        load_user();
+    },[]);
+    
     return (
         <>
             <Header />
@@ -11,4 +19,4 @@ const Layout = () => {
     )
 }
 
-export default Layout;
+export default connect(null, {load_user})(Layout);
