@@ -21,9 +21,9 @@ export default function(state = initialState, action) {
             return{
                 ...state,
                 email: payload.email,
-                first_name: payload.profile.name,
-                last_name: payload.profile.last_name,
-                phone_number: payload.profile.phone_number,
+                first_name: payload.first_name,
+                last_name: payload.last_name,
+                phone_number: payload.phone_number,
             }
         case LOAD_USER_PROFILE_FAIL:
             return{
