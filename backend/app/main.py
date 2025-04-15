@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.products.router import router as router_students
 from app.users.router import router as router_users
 from app.pages.router import router as router_pages
@@ -28,6 +30,19 @@ tags_metadata = [
 
 app = FastAPI(openapi_tags=tags_metadata)
 
+origins = [
+    'http://localhost:3000'
+]
+
+app.add_middleware(
+    # сначапо все запрещаем    
+    CORSMiddleware,
+    # потом начинаем разрешать необходимое
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home_page():
