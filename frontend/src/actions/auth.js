@@ -59,22 +59,27 @@ export const login = (email, password) => async dispatch => {
         const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login/`, body, config);
 
         if(res.data.access_token){
-            console.log("succesfully logined")
             dispatch({
                 type: LOGIN_SUCCESS,
                 payload: res.data.message
             });
 
             dispatch(load_user());
+
+            return { type: LOGIN_SUCCESS };
         } else {
             dispatch({
                 type: LOGIN_FAIL,
             });
+
+            return { type: LOGIN_FAIL };
         }
     } catch (err) {
         dispatch({
             type: LOGIN_FAIL,
         }); 
+
+        return { type: LOGIN_FAIL };
     }
 };
 

@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react'
 
+import { useDispatch } from 'react-redux';
+
+import { logout } from '../actions/auth';
+
 import axios from 'axios';
 
 const Home =()=>{
 
     const [data, setData] = useState({})
+
+    const dispatch = useDispatch()
 
     useEffect(()=>{
         const getData = async () => {
@@ -31,6 +37,7 @@ const Home =()=>{
     return(
         <>
             <div>{data.message}</div>
+            <button onClick={() => dispatch(logout())}>logout</button>
         </>
     )
 };

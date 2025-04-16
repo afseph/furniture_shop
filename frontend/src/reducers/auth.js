@@ -8,7 +8,8 @@ import {
     DELETE_USER_SUCCESS,
     DELETE_USER_FAIL,
     ADMIN_SUCCESS,
-    ADMIN_FAIL, 
+    ADMIN_FAIL,
+    LOAD_USER_PROFILE_SUCCESS
 } from '../actions/types';
 
 const initialState = {
@@ -37,6 +38,11 @@ export default function(state = initialState, action) {
             return {
                 ...state, 
                 isAuthenticated: false
+            }
+        case LOAD_USER_PROFILE_SUCCESS:
+            return{
+                ...state,
+                isAuthenticated: true
             }
         case LOGIN_SUCCESS:
             return {

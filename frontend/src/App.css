@@ -34,3 +34,20 @@ body{
 .navbar-links a:hover {
   color: #00bfff;
 }
+
+/* LoginForm.css */
+
+/* Контейнер для центрирования формы */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5; /* Цвет фона */
+}
+
+/* Стили для самой формы */
+.login-form {
+  width: 100%;
+  max-width: 400px; /* Максимальная ширина формы */
+}

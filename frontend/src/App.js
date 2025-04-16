@@ -6,6 +6,7 @@ import store from './store.js';
 
 import Layout from "./components/Layout.jsx";
 import Home from './pages/Home.jsx';
+import LoginForm from './pages/Login.jsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Layout/>}>
             <Route index  element={<Home />}/>
+            <Route path='/login' element={<LoginForm />}/>
           </Route>
         </Routes>
       </BrowserRouter>
