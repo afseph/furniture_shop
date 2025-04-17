@@ -100,15 +100,20 @@ export const register = (email, password,  first_name, last_name, phone_number) 
             dispatch({
                 type: REGISTER_SUCCESS
             });
+            return { type: REGISTER_SUCCESS }
         } else {
             dispatch({
                 type: REGISTER_FAIL
             });
+
+            return { type: REGISTER_FAIL }
         }
     } catch (err) {
         dispatch({
             type: REGISTER_FAIL
         });
+
+        return { type: REGISTER_FAIL }
     }
 };
 
