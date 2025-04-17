@@ -35,7 +35,7 @@ class SUserUpdateEmail(BaseModel):
 
 
 class SUserUpdatePhone(BaseModel):
-    phone_number: EmailStr = Field(..., description="Email")
+    phone_number: str = Field(..., description="Email")
 
 
 class SUserUpdatePassword(BaseModel):

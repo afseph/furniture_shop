@@ -126,10 +126,10 @@ async def update_user_phone(new_phone: SUserUpdatePhone,
                             user_id: User = Depends(get_curr_user_id)):
     try:
         check = await UsersDAO.update_contact_info(filter_by={'id':user_id},
-                                                    phone_number=new_phone.phone)
+                                                    phone_number=new_phone.phone_number)
         return JSONResponse(content={'status':'success',
-                                     'message':"Телефон успешно изменен!"},
-                                     status_code=200)
+                                        'message':"Телефон успешно изменен!"},
+                                        status_code=200)
     except:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Телефон уже используется!')
