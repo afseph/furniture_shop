@@ -20,3 +20,20 @@ class SUserRegister(BaseModel):
 class SUserAuth(BaseModel):
     email: EmailStr = Field(..., description="Электронная почта")
     password: str = Field(..., min_length=5, max_length=50, description="Пароль, от 5 до 50 знаков")
+
+
+class SUserUpdateName(BaseModel):
+    first_name: str = Field(..., min_length=3, description="Имя")
+
+
+class SUserUpdateLastName(BaseModel):
+    last_name: str = Field(..., min_length=3, description="Фамилия")
+
+
+class SUserUpdateEmail(BaseModel):
+    email: EmailStr = Field(..., description="Email")
+
+
+class SUserUpdatePassword(BaseModel):
+    old_password: str = Field(..., description="Старый пароль")
+    new_password: str = Field(..., description="Новый пароль")

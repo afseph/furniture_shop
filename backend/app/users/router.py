@@ -1,10 +1,14 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends
+from fastapi.responses import JSONResponse
 from app.users.auth import (get_password_hash, authenticate_user, 
-                            create_access_token)
-from app.users.dependencies import (get_current_user, get_current_admin_user)
+                            create_access_token, verify_password)
+from app.users.dependencies import (get_current_user, get_current_admin_user,
+                                    get_curr_user_id)
 from app.users.dao import UsersDAO
 from app.users.models import User
-from app.users.schemas import SUserRegister, SUserAuth
+from app.users.schemas import (SUserRegister, SUserAuth, SUserUpdateName, 
+                               SUserUpdateLastName, SUserUpdateEmail, 
+                               SUserUpdatePassword)
 
 
 
@@ -57,3 +61,89 @@ async def logout_user(response: Response):
 @router.get("/all_users/")
 async def get_all_users(user_data: User = Depends(get_current_admin_user)):
     return await UsersDAO.get_all()
+
+
+@router.put("/update/name/")
+async def update_user_first_name(new_name: SUserUpdateName,
+                                 user_id: User = Depends(get_curr_user_id)):
+    """
+        USER WILL BE GOT FROM CURRENT USER TOKEN
+    """
+
+    check = await UsersDAO.update(filter_by={"id":user_id}, 
+                                  first_name = new_name.first_name)
+    
+    if check:
+        return JSONResponse(content={'message':'Имя пользователя успешно обновленно!', 
+                'new_name':new_name.first_name}, status_code=200)
+    else:
+        return JSONResponse(content={
+                'type': 'error',
+                'message': 'Ошибка при изменении имени пользователя',
+                'new_name': new_name.first_name
+                }, status_code=500)
+
+
+@router.put("/update/lastname/")
+async def update_user_last_name(new_lstname: SUserUpdateLastName,
+                                 user_id: User = Depends(get_curr_user_id)):
+    """
+        USER WILL BE GOT FROM CURRENT USER TOKEN
+    """
+
+    check = await UsersDAO.update(filter_by={"id":user_id}, 
+                                  last_name = new_lstname.last_name)
+    
+    if check:
+        return JSONResponse(content={'message':'Имя пользователя успешно обновленно!', 
+                'new_name':new_lstname.last_name}, status_code=200)
+    else:
+        return JSONResponse(content={
+                'type': 'error',
+                'message': 'Ошибка при изменении имени пользователя',
+                'new_name': new_lstname.last_name
+                }, status_code=500)
+
+
+@router.put('/update/email/')
+async def update_user_email(new_email: SUserUpdateEmail,
+                            user_id: User = Depends(get_curr_user_id)):
+    try:
+        check = await UsersDAO.update_contact_info(filter_by={'id':user_id},
+                                                    email=new_email.email)
+        return JSONResponse(content={'status':'success',
+                                     'message':"Почта успешно изменена!"},
+                                     status_code=200)
+    except:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail='Почта уже используется!')
+
+
+@router.put('/update/password/')
+async def update_user_password(pass_data: SUserUpdatePassword,
+                                user_data: User = Depends(get_current_user)):
+
+    user_data = user_data.to_dict()
+    check_pass = verify_password(pass_data.old_password, user_data.get('password'))
+
+    if not check_pass:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail='Введен неправильно старый пароль!')
+
+    hashed_new_pass = get_password_hash(pass_data.new_password)
+
+    try:
+        check = await UsersDAO.update(filter_by={'id':user_data.get('id')},
+                                    password = hashed_new_pass)
+
+        if check:
+            return JSONResponse(content={
+                'status':'success',
+                'message':'Пароль успешно изменен!',
+            }, status_code=200)
+        else:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail='Что-то пошло не так!')
+    except:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail='Что-то пошло не так!')
