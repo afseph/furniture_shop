@@ -37,7 +37,6 @@ const Home =()=>{
     return(
         <>
             <div>{data.message}</div>
-            <button onClick={() => dispatch(logout())}>logout</button>
         </>
     )
 };

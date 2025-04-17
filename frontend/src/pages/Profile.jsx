@@ -16,12 +16,18 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 
+import { useNavigate } from 'react-router-dom';
+
 import { UPDATE_USER_PROFILE_SUCCESS } from '../actions/types';
 
 
 const Profile = () => {
     const profile = useSelector((state) => state.profile);
+
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
+
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -131,6 +137,8 @@ const Profile = () => {
             </Space>
         </Descriptions.Item>
     );
+
+    if (!isAuthenticated) return navigate('/login')
 
     return (
         <>

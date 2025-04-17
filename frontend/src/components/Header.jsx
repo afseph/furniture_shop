@@ -1,8 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../actions/auth";
+
 
 const Header = () => {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const dispatch = useDispatch();
 
   return (
     <nav className="navbar">
@@ -11,7 +14,7 @@ const Header = () => {
         <li><a href="/">Главная</a></li>
         {isAuthenticated ? (
           <>
-            <li><a href="/profile">Профиль</a> / <a href="/logout">Выход</a></li>
+            <li><a href="/profile">Профиль</a> / <a href="#" onClick={()=>{dispatch(logout())}}>Выход</a></li>
           </>
         ) : (
           <li><a href="/login">Вход</a> / <a href="/register">Регистрация</a></li>
