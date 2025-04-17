@@ -1,26 +1,37 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Descriptions, Button, Space, Modal, Form, Input, message } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import {
+    Card,
+    Descriptions,
+    Button,
+    Space,
+    Modal,
+    Form,
+    Input,
+    message,
+} from 'antd';
+import {
+    EditOutlined,
+    LockOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
 
-const UPDATE_USER_PROFILE_SUCCESS = 'UPDATE_USER_PROFILE_SUCCESS';
+import { UPDATE_USER_PROFILE_SUCCESS } from '../actions/types';
+
 
 const Profile = () => {
-    const profile = useSelector(state => state.profile);
+    const profile = useSelector((state) => state.profile);
     const dispatch = useDispatch();
 
-    const [messageApi, contextHolder] = message.useMessage();
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [currentField, setCurrentField] = useState(null);
     const [form] = Form.useForm();
+    const [passwordForm] = Form.useForm();
 
+    const [messageApi, contextHolder] = message.useMessage();
     const msg = (type, content) => {
-        messageApi.open({
-            type: type,
-            content: content,
-        });
+        messageApi.open({ type, content });
     };
 
     const apiEndpoints = {
@@ -41,12 +52,11 @@ const Profile = () => {
             const { value } = await form.validateFields();
 
             if (!currentField || !apiEndpoints[currentField]) {
-                message.error('Обновление этого поля не поддерживается.');
+                msg('error', 'Обновление этого поля не поддерживается.');
                 return;
             }
 
             const payload = { [currentField]: value };
-
             const response = await axios.put(`${process.env.REACT_APP_API_URL}`+apiEndpoints[currentField], payload);
 
             if (response.data?.status === 'success') {
@@ -64,12 +74,43 @@ const Profile = () => {
                 setIsModalOpen(false);
                 form.resetFields();
             } else {
-                msg('error', 'Сервер не подтвердил обновление.')
-                console.warn('Ошибка в ответе API:', response.data);
+                msg('error', 'Сервер не подтвердил обновление.');
+                console.warn('Ответ API:', response.data);
             }
         } catch (err) {
-            msg('error', `Ошибка при сохранении! ${err.response.data.detail}`)
-            console.error(err.response.data.detail);
+            if (err.response.data.detail){
+                msg('error', `Ошибка при сохранении! ${err.response.data.detail}`);
+            }else{
+                msg('error', `Ошибка при сохранении!`);
+            }
+            console.error(err);
+        }
+    };
+
+    const handlePasswordChange = async () => {
+        try {
+            const { old_password, new_password } = await passwordForm.validateFields([
+                'old_password',
+                'new_password',
+                'confirm_password',
+            ]);
+
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/auth/update/password/`, {
+                old_password,
+                new_password,
+            });
+
+            if (response.data?.status === 'success') {
+                msg('success', 'Пароль успешно изменён');
+                setIsPasswordModalOpen(false);
+                passwordForm.resetFields();
+            } else {
+                msg('error', 'Не удалось изменить пароль');
+                console.warn('Ответ API:', response.data);
+            }
+        } catch (err) {
+            msg('error', `Ошибка при изменении пароля! ${err.response.data.detail}`);
+            console.error(err);
         }
     };
 
@@ -93,16 +134,30 @@ const Profile = () => {
 
     return (
         <>
-        {contextHolder}
-            <Card title="Профиль пользователя" style={{ maxWidth: 600, margin: '0 auto', marginTop: 40 }}>
+            {contextHolder}
+            <Card
+                title="Профиль пользователя"
+                style={{ maxWidth: 600, margin: '0 auto', marginTop: 40 }}
+            >
                 <Descriptions column={1} bordered>
-                    {renderItem("Email", "email")}
-                    {renderItem("Имя", "first_name")}
-                    {renderItem("Фамилия", "last_name")}
-                    {renderItem("Телефон", "phone_number")}
+                    {renderItem('Email', 'email')}
+                    {renderItem('Имя', 'first_name')}
+                    {renderItem('Фамилия', 'last_name')}
+                    {renderItem('Телефон', 'phone_number')}
                 </Descriptions>
             </Card>
 
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+                <Button
+                    icon={<LockOutlined />}
+                    type="primary"
+                    onClick={() => setIsPasswordModalOpen(true)}
+                >
+                    Изменить пароль
+                </Button>
+            </div>
+
+            {/* Модалка редактирования полей */}
             <Modal
                 title={`Редактирование поля: ${currentField}`}
                 open={isModalOpen}
@@ -118,6 +173,61 @@ const Profile = () => {
                         rules={[{ required: true, message: 'Пожалуйста, введите значение' }]}
                     >
                         <Input />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Модалка смены пароля */}
+            <Modal
+                title="Изменение пароля"
+                open={isPasswordModalOpen}
+                onOk={handlePasswordChange}
+                onCancel={() => {
+                    setIsPasswordModalOpen(false);
+                    passwordForm.resetFields();
+                }}
+                okText="Сохранить"
+                cancelText="Отмена"
+            >
+                <Form form={passwordForm} layout="vertical">
+                    <Form.Item
+                        label="Старый пароль"
+                        name="old_password"
+                        rules={[{ required: true, message: 'Введите старый пароль' }]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Новый пароль"
+                        name="new_password"
+                        rules={[
+                            { required: true, message: 'Введите новый пароль' },
+                            { min: 5, message: 'Пароль должен быть минимум 5 символов' },
+                        ]}
+                        hasFeedback
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Подтвердите новый пароль"
+                        name="confirm_password"
+                        dependencies={['new_password']}
+                        hasFeedback
+                        rules={[
+                            { required: true, message: 'Подтвердите новый пароль' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('new_password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('Пароли не совпадают'));
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password />
                     </Form.Item>
                 </Form>
             </Modal>
