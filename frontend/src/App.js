@@ -8,6 +8,7 @@ import Layout from "./components/Layout.jsx";
 import Home from './pages/Home.jsx';
 import LoginForm from './pages/Login.jsx';
 import RegisterForm from './pages/Register.jsx';
+import Profile from './pages/Profile.jsx';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route index  element={<Home />}/>
             <Route path='/login' element={<LoginForm />}/>
             <Route path='/register' element={<RegisterForm />}/>
+            <Route path='/profile' element={<Profile />}/>
           </Route>
         </Routes>
       </BrowserRouter>
