@@ -8,7 +8,7 @@ from app.users.dao import UsersDAO
 from app.users.models import User
 from app.users.schemas import (SUserRegister, SUserAuth, SUserUpdateName, 
                                SUserUpdateLastName, SUserUpdateEmail, 
-                               SUserUpdatePassword)
+                               SUserUpdatePassword, SUserUpdatePhone)
 
 
 
@@ -74,7 +74,8 @@ async def update_user_first_name(new_name: SUserUpdateName,
                                   first_name = new_name.first_name)
     
     if check:
-        return JSONResponse(content={'message':'Имя пользователя успешно обновленно!', 
+        return JSONResponse(content={'status':'success',
+                'message':'Имя пользователя успешно обновленно!', 
                 'new_name':new_name.first_name}, status_code=200)
     else:
         return JSONResponse(content={
@@ -95,7 +96,8 @@ async def update_user_last_name(new_lstname: SUserUpdateLastName,
                                   last_name = new_lstname.last_name)
     
     if check:
-        return JSONResponse(content={'message':'Имя пользователя успешно обновленно!', 
+        return JSONResponse(content={'status':'success',
+                                     'message':'Имя пользователя успешно обновленно!', 
                 'new_name':new_lstname.last_name}, status_code=200)
     else:
         return JSONResponse(content={
@@ -117,6 +119,20 @@ async def update_user_email(new_email: SUserUpdateEmail,
     except:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Почта уже используется!')
+
+
+@router.put('/update/phone/')
+async def update_user_phone(new_phone: SUserUpdatePhone,
+                            user_id: User = Depends(get_curr_user_id)):
+    try:
+        check = await UsersDAO.update_contact_info(filter_by={'id':user_id},
+                                                    phone_number=new_phone.phone)
+        return JSONResponse(content={'status':'success',
+                                     'message':"Телефон успешно изменен!"},
+                                     status_code=200)
+    except:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail='Телефон уже используется!')
 
 
 @router.put('/update/password/')

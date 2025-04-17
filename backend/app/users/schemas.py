@@ -34,6 +34,10 @@ class SUserUpdateEmail(BaseModel):
     email: EmailStr = Field(..., description="Email")
 
 
+class SUserUpdatePhone(BaseModel):
+    phone_number: EmailStr = Field(..., description="Email")
+
+
 class SUserUpdatePassword(BaseModel):
     old_password: str = Field(..., description="Старый пароль")
     new_password: str = Field(..., description="Новый пароль")
