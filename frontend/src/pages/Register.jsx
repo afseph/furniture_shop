@@ -17,8 +17,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-    //   navigate('/profile');
-    console.log('Already authenticated!')
+      navigate('/profile');
     }
   }, [isAuthenticated, navigate]);
 
@@ -29,23 +28,22 @@ const RegisterForm = () => {
     });
   };
 
-  const onFinish = async ({ email, password, first_name, last_name, phone_number }) => {
+  const onFinish = async ({ email, password, first_name, last_name, prefix, phone_number }) => {
     setLoading(true);
 
-    console.log(phone_number)
+    const phone = prefix + phone_number
 
     try {
-      const action = await dispatch(register(email, password, first_name, last_name, phone_number));
+      const action = await dispatch(register(email, password, first_name, last_name, phone));
 
-      if (action.type === 'REGISTER_SUCCESS ') {
+      if (action.type == 'REGISTER_SUCCESS') {
         msg('success', 'Успешная регестрация!');
         navigate('/login');
       } else {
-        msg('error', 'Ошибка регистрации.');
+        msg('error', action.detail);
       }
     } catch (error) {
-      msg('error', 'Ошибка входа.');
-      console.error(error);
+      msg('error', 'Ошибка регистрации.');
     } finally {
       setLoading(false);
     }
@@ -54,8 +52,7 @@ const RegisterForm = () => {
   const prefixSelector = (
     <Form.Item name="prefix" noStyle>
       <Select style={{ width: 70 }}>
-        <Option value="86">+86</Option>
-        <Option value="87">+87</Option>
+        <Option value="+7">+7</Option>
       </Select>
     </Form.Item>
   );
@@ -87,6 +84,7 @@ const RegisterForm = () => {
           name="first_name"
           rules={[
             { required: true, message: 'Пожалуйста, введите имя!' },
+            { min: 3, message:"Имя должено содержать минимум 3 символа!"}
           ]}
         >
           <Input />
@@ -97,6 +95,7 @@ const RegisterForm = () => {
           name="last_name"
           rules={[
             { required: true, message: 'Пожалуйста, введите фамилию!' },
+            { min: 3, message:"Фамилия должена содержать минимум 3 символа!"}
           ]}
         >
           <Input />
@@ -115,27 +114,29 @@ const RegisterForm = () => {
         <Form.Item
           label="Пароль"
           name="password"
-          rules={[{ required: true, message: 'Пожалуйста, введите пароль!' }]}
+          rules={[{ required: true, message: 'Пожалуйста, введите пароль!' }, 
+            { min: 5, message:"Пароль должен содержать минимум 5 символов!"}
+          ]}
         >
           <Input.Password />
         </Form.Item>
 
         <Form.Item
         name="confirm"
-        label="Confirm Password"
+        label="Подтвердите пароль"
         dependencies={['password']}
         hasFeedback
         rules={[
           {
             required: true,
-            message: 'Please confirm your password!',
+            message: 'Пожалуйста, подтвердите пароль!',
           },
           ({ getFieldValue }) => ({
             validator(_, value) {
               if (!value || getFieldValue('password') === value) {
                 return Promise.resolve();
               }
-              return Promise.reject(new Error('The new password that you entered do not match!'));
+              return Promise.reject(new Error('Пароли не совпадают!'));
             },
           }),
         ]}

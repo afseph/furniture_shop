@@ -96,7 +96,7 @@ export const register = (email, password,  first_name, last_name, phone_number) 
     try {
         const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register/`, body, config);
 
-        if (res.data.message) {
+        if (res.data.message === "Вы успешно зарегистрированы!") {
             dispatch({
                 type: REGISTER_SUCCESS
             });
@@ -113,7 +113,7 @@ export const register = (email, password,  first_name, last_name, phone_number) 
             type: REGISTER_FAIL
         });
 
-        return { type: REGISTER_FAIL }
+        return { type: REGISTER_FAIL, detail: err.response.data.detail }
     }
 };
 
