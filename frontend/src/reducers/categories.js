@@ -4,7 +4,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-    categories: null,
+    categories: [],
 };
 
 export default function(state = initialState, action) {
@@ -18,8 +18,7 @@ export default function(state = initialState, action) {
             }
         case CATEGORIES_LOAD_FAIL:
             return {
-                ...state,
-                categories: null
+                ...state
             }
         default:
             return state

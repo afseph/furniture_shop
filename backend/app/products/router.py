@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select 
 from app.database import async_session_maker 
 
@@ -26,7 +26,8 @@ async def add_product(product: SProductADD):
     check = await ProductDAO.add_product(**product.dict())
     if check:
         return {'message':'Товарная группа успешно добавленна!', 
-                'product': product}
+                'product': product,
+                'product_id': check}
     else:
         return {'message':'Ошибка при добавлении товарной группы!'}
 
@@ -49,12 +50,17 @@ async def get_all_product_types():
 
 @router.post('/types/add/',summary='Создание товара.', tags=['Product Types'])
 async def add_product_type(producttype: SProductTypeADD) -> dict:
-    check = await ProductTypeDAO.add_product_type(**producttype.dict())
-    if check:
-        return {'message':'Товар успешно добавлен!',
-                'product': producttype}
-    else:
-        return {'message':'Ошибка при добалении товара!'}
+    try:
+        check = await ProductTypeDAO.add_product_type(**producttype.dict())
+        if check:
+            return {'message':'Товар успешно добавлен!',
+                    'product': producttype,
+                    'type_id': check}
+        else:
+            return {'message':'Ошибка при добалении товара!'}
+    except:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail='Артикул уже существует!')
 
 
 @router.put('/types/amount/update/', summary='Изменение остатоков товара.', tags=['Product Types'])

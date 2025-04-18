@@ -12,6 +12,8 @@ import Profile from './pages/Profile.jsx';
 import CategoryCatalog from './pages/Catalog.jsx';
 import ProductList from './pages/Products.jsx';
 
+import ProductCreate from './admin_components/Products_creation.jsx';
+
 function App() {
   return (
     <>
@@ -25,6 +27,7 @@ function App() {
             <Route path='/profile' element={<Profile />}/>
             <Route path='/catalog' element={<CategoryCatalog />}/>
             <Route path='/products' element={<ProductList />}/>
+            <Route path='/products/create' element={<ProductCreate />}/>
           </Route>
         </Routes>
       </BrowserRouter>
