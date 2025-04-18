@@ -4,11 +4,13 @@ import Header from './Header.jsx'
 import { connect } from 'react-redux';
 
 import { load_user } from '../actions/profile.js';
+import { load_categories } from '../actions/categories.js';
 
-const Layout = ({ load_user }) => {
+const Layout = ({ load_user, load_categories }) => {
 
     useEffect(() => {
         load_user();
+        load_categories();
     },[]);
     
     return (
@@ -19,4 +21,4 @@ const Layout = ({ load_user }) => {
     )
 }
 
-export default connect(null, {load_user})(Layout);
+export default connect(null, {load_user, load_categories})(Layout);
