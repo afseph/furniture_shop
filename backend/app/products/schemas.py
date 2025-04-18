@@ -23,6 +23,12 @@ class SProductADD(BaseModel):
     category_id: int = Field(..., description="ID Категории.")
 
 
+class SProductUPDATE(BaseModel):
+    title: str = Field(..., description="Название товара.")
+    description: str = Field(..., description="Описание товара.")
+    category_id: int = Field(..., description="ID Категории.")
+
+
 class SProductTypeADD(BaseModel):
     art: int = Field(..., description="Артикул товара")
     amount: int = Field(..., description="Остаток")
@@ -67,6 +73,12 @@ class SProductType(BaseModel):
     price: float = Field(..., description="Цена товара")
     product_id: int = Field(..., description="ID товарной группы")
     characteristics: list[SCharacteristic]
+
+
+class SProductTypeUPDATE(BaseModel):
+    art: int = Field(..., description="Артикул товара")
+    amount: int = Field(..., description="Остаток")
+    price: float = Field(..., description="Цена товара")
 
 
 class SCategory(BaseModel):

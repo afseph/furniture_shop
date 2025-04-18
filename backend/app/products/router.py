@@ -8,7 +8,8 @@ from app.products.schemas import (SProducts, SCategoryADD, SCategoryUPDATE,
                                 SProductTypeUPDATEprice, SProductTypeUPDATEamount,
                                 SProductTypeUPDATEproduct, SCharacterisricsADD,
                                 SCharacteristicBINDINGdata, SCharacteristic, 
-                                SProductResponse)
+                                SProductResponse, SProductTypeUPDATE,
+                                SProductUPDATE)
 from app.products.dao import ProductDAO, CategoryDAO, ProductTypeDAO, CharacteristicDAO
 from app.products.rb import RBProduct, RBCharacteristic
 
@@ -41,6 +42,22 @@ async def delete_product(product_id: int) -> dict:
         return {'message':f'Ошибка при удалении товарной группы с ID {product_id}'}
 
 
+@router.put('/update/{type_id}')
+async def update_product(type_id: int, product_data: SProductUPDATE):
+    check = await ProductDAO.update(filter_by={'id':type_id},
+                                        title = product_data.title,
+                                        description = product_data.description,
+                                        category_id = product_data.category_id)
+    if check:
+        return {'message':'Товар успешно обновлен!',
+                'art':type_id}
+    else:
+        return {
+                'message':
+                f'Ошибка при обновлении товара с ID {type_id}'
+                }
+
+
 # ! PRODUCT TYPES SECTION
 
 @router.get('/types/all/',summary='Получение всех товаров.', tags = ['Product Types'])
@@ -61,6 +78,22 @@ async def add_product_type(producttype: SProductTypeADD) -> dict:
     except:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Артикул уже существует!')
+
+
+@router.put('/types/update/{type_id}')
+async def update_product_type(type_id: int, type_data: SProductTypeUPDATE):
+    check = await ProductTypeDAO.update(filter_by={'art':type_id},
+                                        art = type_data.art,
+                                        amount = type_data.amount,
+                                        price = type_data.price)
+    if check:
+        return {'message':'Товар успешно обновлен!',
+                'art':type_id}
+    else:
+        return {
+                'message':
+                f'Ошибка при обновлении остатоков товара с артикулом {type_id}'
+                }
 
 
 @router.put('/types/amount/update/', summary='Изменение остатоков товара.', tags=['Product Types'])

@@ -13,6 +13,7 @@ import CategoryCatalog from './pages/Catalog.jsx';
 import ProductList from './pages/Products.jsx';
 
 import ProductCreate from './admin_components/Products_creation.jsx';
+import ProductEdit from './admin_components/Products_update.jsx';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path='/catalog' element={<CategoryCatalog />}/>
             <Route path='/products' element={<ProductList />}/>
             <Route path='/products/create' element={<ProductCreate />}/>
+            <Route path='/products/update/:productId' element={<ProductEdit />}/>
           </Route>
         </Routes>
       </BrowserRouter>
