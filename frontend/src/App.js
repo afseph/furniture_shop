@@ -9,6 +9,7 @@ import Home from './pages/Home.jsx';
 import LoginForm from './pages/Login.jsx';
 import RegisterForm from './pages/Register.jsx';
 import Profile from './pages/Profile.jsx';
+import CategoryCatalog from './pages/Catalog.jsx';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path='/login' element={<LoginForm />}/>
             <Route path='/register' element={<RegisterForm />}/>
             <Route path='/profile' element={<Profile />}/>
+            <Route path='/catalog' element={<CategoryCatalog />}/>
           </Route>
         </Routes>
       </BrowserRouter>
