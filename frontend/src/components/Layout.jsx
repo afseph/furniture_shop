@@ -5,12 +5,14 @@ import { connect } from 'react-redux';
 
 import { load_user } from '../actions/profile.js';
 import { load_categories } from '../actions/categories.js';
+import { checkAdmin } from '../actions/auth.js';
 
-const Layout = ({ load_user, load_categories }) => {
+const Layout = ({ load_user, load_categories, checkAdmin }) => {
 
     useEffect(() => {
         load_user();
         load_categories();
+        checkAdmin();
     },[]);
     
     return (
@@ -21,4 +23,4 @@ const Layout = ({ load_user, load_categories }) => {
     )
 }
 
-export default connect(null, {load_user, load_categories})(Layout);
+export default connect(null, {load_user, load_categories, checkAdmin})(Layout);

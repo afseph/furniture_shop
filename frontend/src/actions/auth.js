@@ -13,37 +13,37 @@ import {
     ADMIN_SUCCESS
 } from "./types"
 
-// TODO export const checkAdmin = () => async dispatch => {
-//     const config = {
-//         headers: {
-//             'Accept': 'application/json',
-//             'Content-Type': 'application/json',
-//         }
-//     };
-//     try {
-//         const res = await axios.get(`${process.env.REACT_APP_API_URL}/isadmin/`, config);
+export const checkAdmin = () => async dispatch => {
+    const config = {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    };
+    try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/is_admin/`, config);
 
-//         if (res.data.error || res.data.isAdmin === 'error'){
-//             dispatch({
-//                 type: ADMIN_FAIL,
-//             });
-//         }
-//         else if(res.data.isAdmin === 'success'){
-//             dispatch({
-//                 type: ADMIN_SUCCESS,
-//             });
-//         }
-//         else {
-//             dispatch({
-//                 type: ADMIN_FAIL,
-//             });
-//         }
-//     } catch (err) {
-//         dispatch({
-//             type: ADMIN_FAIL,
-//         });
-//     }
-// };
+        if (res.data.error || res.data.isAdmin === false){
+            dispatch({
+                type: ADMIN_FAIL,
+            });
+        }
+        else if(res.data.isAdmin === true){
+            dispatch({
+                type: ADMIN_SUCCESS,
+            });
+        }
+        else {
+            dispatch({
+                type: ADMIN_FAIL,
+            });
+        }
+    } catch (err) {
+        dispatch({
+            type: ADMIN_FAIL,
+        });
+    }
+};
 
 export const login = (email, password) => async dispatch => {
     const config = {
