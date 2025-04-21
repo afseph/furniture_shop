@@ -65,6 +65,7 @@ export const login = (email, password) => async dispatch => {
             });
 
             dispatch(load_user());
+            dispatch(checkAdmin());
 
             return { type: LOGIN_SUCCESS };
         } else {

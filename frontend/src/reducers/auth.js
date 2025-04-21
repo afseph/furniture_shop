@@ -54,6 +54,7 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 isAuthenticated: false,
+                isAdmin: false,
                 email: ''
             }
         case DELETE_USER_SUCCESS:

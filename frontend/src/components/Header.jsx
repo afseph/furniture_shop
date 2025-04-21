@@ -48,7 +48,7 @@ const Header = () => {
         </Dropdown></li>): ("")}
         {isAuthenticated ? (
           <>
-            <li><a href="/profile">Профиль</a> / <a href="#" onClick={()=>{dispatch(logout())}}>Выход</a></li>
+            <li><a href="/profile">Профиль</a> / <a href="#" onClick={(e)=>{e.preventDefault(); dispatch(logout());}}>Выход</a></li>
           </>
         ) : (
           <li><a href="/login">Вход</a> / <a href="/register">Регистрация</a></li>
