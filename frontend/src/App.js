@@ -14,6 +14,7 @@ import ProductList from './pages/Products.jsx';
 
 import ProductCreate from './admin_components/Products_creation.jsx';
 import ProductEdit from './admin_components/Products_update.jsx';
+import CategoryCreate from './admin_components/Category_creation.jsx';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path='/products' element={<ProductList />}/>
             <Route path='/products/create' element={<ProductCreate />}/>
             <Route path='/products/update/:productId' element={<ProductEdit />}/>
+            <Route path='/categories/create' element={<CategoryCreate />}/>
           </Route>
         </Routes>
       </BrowserRouter>

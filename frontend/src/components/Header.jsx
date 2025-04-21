@@ -26,7 +26,11 @@ const Header = () => {
         },
         {
           key: '2-2',
-          label: '4th menu item',
+          label: (
+            <a href="/categories/create/">
+              Добавить категорию.
+            </a>
+          )
         },
       ],
     }

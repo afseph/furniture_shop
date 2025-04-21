@@ -234,7 +234,7 @@ async def update_category(category: SCategoryUPDATE) -> dict:
         return {'message':'Ошибка при обновлении названия категории!'}
 
 
-@router.delete("/delete/{category_id}",summary='Удаление категории.' ,tags=['Categories'])
+@router.delete("/category/delete/{category_id}",summary='Удаление категории.' ,tags=['Categories'])
 async def delete_category(category_id: int) -> dict:
     check = await CategoryDAO.delete(id=category_id)
     if check:
