@@ -57,7 +57,6 @@ const Header = () => {
         ) : (
           <li><a href="/login">Вход</a> / <a href="/register">Регистрация</a></li>
         )}
-        <li><a href="/contact">Контакты</a></li>
       </ul>
     </nav>
   );

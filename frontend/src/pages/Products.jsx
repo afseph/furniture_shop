@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Card, Row, Col, Tag, Typography, List, Divider, Spin, Button, Space, Popconfirm, message } from 'antd';
+import {
+  Card, Row, Col, Tag, Typography, List, Divider,
+  Spin, Button, Space, Popconfirm, message, InputNumber
+} from 'antd';
 import axios from 'axios';
 
 const ProductList = () => {
   const { search } = useLocation();
   const navigate = useNavigate();
   const isAdmin = useSelector(state => state.auth.isAdmin);
+  const isAuth = useSelector(state => state.auth.isAuthenticated);
   const params = new URLSearchParams(search);
   const categoryId = params.get('category_id');
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quantities, setQuantities] = useState({});
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const msg = (type, content) => {
+    messageApi.open({
+      type,
+      content,
+    });
+  };
 
   const { Title, Text } = Typography;
 
@@ -24,14 +38,8 @@ const ProductList = () => {
           'Content-Type': 'application/json',
         }
       };
-
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/all/?category_id=${category_id}`, config);
-      if (Array.isArray(res.data)) {
-        setData(res.data);
-      } else {
-        console.warn('Полученные данные не массив:', res.data);
-        setData([]);
-      }
+      setData(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error('Ошибка при загрузке товаров:', error);
       setData([]);
@@ -54,6 +62,20 @@ const ProductList = () => {
     }
   };
 
+  const handleAddToCart = async (art) => {
+    const quantity = quantities[art] || 1;
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/cart/add/?product_type_art=${art}&quantity=${quantity}`);
+      msg('success', 'Товар добавлен в корзину');
+    } catch (error) {
+      msg('error', 'Ошибка при добавлении в корзину');
+    }
+  };
+
+  const handleQuantityChange = (art, value) => {
+    setQuantities(prev => ({ ...prev, [art]: value }));
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -69,6 +91,7 @@ const ProductList = () => {
 
   return (
     <div style={{ padding: 24 }}>
+      {contextHolder}
       <Title level={2}>Товары</Title>
       <Row gutter={[16, 16]}>
         {data.map(product => (
@@ -97,6 +120,21 @@ const ProductList = () => {
                       </List.Item>
                     )}
                   />
+                  <Space style={{ marginTop: 8 }}>
+                    <InputNumber
+                      min={1}
+                      max={type.amount}
+                      defaultValue={1}
+                      onChange={(value) => handleQuantityChange(type.art, value)}
+                    />
+                    <Button
+                      type="primary"
+                      onClick={() => handleAddToCart(type.art)}
+                      disabled={!isAuth}
+                    >
+                      В корзину
+                    </Button>
+                  </Space>
                 </div>
               ))}
               {isAdmin && (
