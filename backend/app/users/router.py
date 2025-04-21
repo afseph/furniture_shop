@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from app.users.auth import (get_password_hash, authenticate_user, 
                             create_access_token, verify_password)
 from app.users.dependencies import (get_current_user, get_current_admin_user,
-                                    get_curr_user_id)
+                                    get_curr_user_id, check_is_user_admin)
 from app.users.dao import UsersDAO
 from app.users.models import User
 from app.users.schemas import (SUserRegister, SUserAuth, SUserUpdateName, 
@@ -61,6 +61,12 @@ async def logout_user(response: Response):
 @router.get("/all_users/")
 async def get_all_users(user_data: User = Depends(get_current_admin_user)):
     return await UsersDAO.get_all()
+
+
+@router.get('/is_admin/')
+async def is_user_admin(is_admin: User = Depends(check_is_user_admin)):
+    return JSONResponse(content={'isAdmin': is_admin}, 
+                        status_code=status.HTTP_200_OK)
 
 
 @router.put("/update/name/")

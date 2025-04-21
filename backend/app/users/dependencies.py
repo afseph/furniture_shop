@@ -41,5 +41,8 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
 
 
+async def check_is_user_admin(current_user: User = Depends(get_current_user)):
+    return current_user.is_admin
+
 async def get_curr_user_id(current_user: User = Depends(get_current_user)):
     return current_user.id
