@@ -9,11 +9,13 @@ import {
   Card,
   message,
   Spin,
-  Select
+  Select,
+  Popconfirm
 } from 'antd';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -62,14 +64,15 @@ const ProductEdit = () => {
           const charIds = t.characteristics.map((c) => c.id);
           return {
             id: t.id,
-            originalArt: t.art, // сохранённый артикул
+            originalArt: t.art,
             art: t.art,
             amount: t.amount,
             price: t.price,
             selectedCharacteristics: charIds,
             initialCharacteristics: charIds,
             newCharacteristicName: '',
-            newCharacteristicValue: ''
+            newCharacteristicValue: '',
+            isNew: false // существующий товар
           };
         });
 
@@ -97,7 +100,6 @@ const ProductEdit = () => {
   }, [productId, form]);
 
   const onFinish = async (values) => {
-    // Объединяем оригинальные поля
     values.product_types = values.product_types.map(pt => {
       const original = initialProductTypes.find(orig => orig.originalArt === pt.originalArt || orig.art === pt.art);
       return {
@@ -124,27 +126,32 @@ const ProductEdit = () => {
     try {
       msg('loading', 'Сохраняем изменения...');
 
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/products/update/${productId}`,
-        {
-          title: values.title,
-          description: values.description,
-          category_id: values.category_id,
-        }
-      );
+      await axios.put(`${process.env.REACT_APP_API_URL}/products/update/${productId}`, {
+        title: values.title,
+        description: values.description,
+        category_id: values.category_id,
+      });
 
       for (const type of values.product_types) {
-        // обновляем product_type по старому артикулу
-        await axios.put(
-          `${process.env.REACT_APP_API_URL}/products/types/update/${type.originalArt}`,
-          {
+        if (type.isNew) {
+          const res = await axios.post(`${process.env.REACT_APP_API_URL}/products/types/add/`, {
+            product_id: productId,
             art: type.art,
             amount: type.amount,
             price: type.price,
-          }
-        );
+          });
+          type.art = res.data.art || type.art;
+        } else {
+          await axios.put(
+            `${process.env.REACT_APP_API_URL}/products/types/update/${type.originalArt}`,
+            {
+              art: type.art,
+              amount: type.amount,
+              price: type.price,
+            }
+          );
+        }
 
-        // отвязываем только удалённые характеристики
         const selected = type.selectedCharacteristics || [];
         const initial = type.initialCharacteristics || [];
         const toUnbind = initial.filter(id => !selected.includes(id));
@@ -206,13 +213,50 @@ const ProductEdit = () => {
 
           <Divider orientation="left">Варианты товара</Divider>
           <Form.List name="product_types">
-            {(fields) => (
+            {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name }) => (
-                  <Card key={key} type="inner" title={`Вариант #${key + 1}`} style={{ marginBottom: 24 }}>
-                    <Form.Item name={[name, 'art']} label="Артикул" rules={[{ required: true }]}>
-                      <Input disabled/>
+                  <Card
+                    key={key}
+                    type="inner"
+                    title={`Вариант #${key + 1}`}
+                    style={{ marginBottom: 24 }}
+                    extra={
+                      <Popconfirm
+                        title="Удалить этот вариант?"
+                        onConfirm={async () => {
+                          const current = form.getFieldValue(['product_types', name]);
+                          if (current?.originalArt && !current.isNew) {
+                            try {
+                              await axios.delete(
+                                `${process.env.REACT_APP_API_URL}/products/types/delete/${current.originalArt}`
+                              );
+                              msg('success', 'Вариант удалён');
+                            } catch (e) {
+                              console.error(e);
+                              msg('error', 'Ошибка при удалении');
+                            }
+                          }
+                          remove(name);
+                        }}
+                      >
+                        <Button danger icon={<MinusCircleOutlined />} />
+                      </Popconfirm>
+                    }
+                  >
+                    <Form.Item shouldUpdate noStyle>
+                      {() => {
+                        const current = form.getFieldValue(['product_types', name]);
+                        const isExisting = !current?.isNew;
+
+                        return (
+                          <Form.Item name={[name, 'art']} label="Артикул" rules={[{ required: true }]}>
+                            <Input disabled={isExisting} />
+                          </Form.Item>
+                        );
+                      }}
                     </Form.Item>
+
                     <Form.Item name={[name, 'amount']} label="Остаток" rules={[{ required: true }]}>
                       <InputNumber min={0} style={{ width: '100%' }} />
                     </Form.Item>
@@ -239,12 +283,35 @@ const ProductEdit = () => {
                     </Form.Item>
                   </Card>
                 ))}
+
+                <Form.Item>
+                  <Button
+                    type="dashed"
+                    onClick={() =>
+                      add({
+                        art: '',
+                        amount: 0,
+                        price: 0,
+                        selectedCharacteristics: [],
+                        newCharacteristicName: '',
+                        newCharacteristicValue: '',
+                        isNew: true
+                      })
+                    }
+                    block
+                    icon={<PlusOutlined />}
+                  >
+                    Добавить вариант товара
+                  </Button>
+                </Form.Item>
               </>
             )}
           </Form.List>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit">Сохранить изменения</Button>
+            <Button type="primary" htmlType="submit">
+              Сохранить изменения
+            </Button>
           </Form.Item>
         </Form>
       )}
