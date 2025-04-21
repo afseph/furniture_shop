@@ -28,7 +28,7 @@ const Header = () => {
           key: '2-2',
           label: (
             <a href="/categories/create/">
-              Добавить категорию.
+              Менеджер категорий.
             </a>
           )
         },

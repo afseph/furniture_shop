@@ -1,47 +1,59 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Card, Row, Col, Tag, Typography, List, Divider, Spin } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Card, Row, Col, Tag, Typography, List, Divider, Spin, Button, Space, Popconfirm, message } from 'antd';
 import axios from 'axios';
 
 const ProductList = () => {
   const { search } = useLocation();
+  const navigate = useNavigate();
+  const isAdmin = useSelector(state => state.auth.isAdmin);
   const params = new URLSearchParams(search);
   const categoryId = params.get('category_id');
 
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // 👈 состояние загрузки
+  const [loading, setLoading] = useState(true);
 
   const { Title, Text } = Typography;
 
-  useEffect(() => {
-    const getProducts = async (category_id) => {
-      try {
-        const config = {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          }
-        };
-
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/all/?category_id=${category_id}`, config);
-        if (Array.isArray(res.data)) {
-          setData(res.data);
-        } else {
-          console.warn('Полученные данные не массив:', res.data);
-          setData([]);
+  const fetchProducts = async (category_id) => {
+    try {
+      const config = {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
         }
-      } catch (error) {
-        console.error('Ошибка при загрузке товаров:', error);
-        setData([]);
-      } finally {
-        setLoading(false); // ✅ загрузка завершена
-      }
-    };
+      };
 
-    getProducts(categoryId);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/all/?category_id=${category_id}`, config);
+      if (Array.isArray(res.data)) {
+        setData(res.data);
+      } else {
+        console.warn('Полученные данные не массив:', res.data);
+        setData([]);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке товаров:', error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(categoryId);
   }, [categoryId]);
 
-  // 🔄 Спиннер при загрузке
+  const handleDelete = async (productId) => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/products/delete/${productId}`);
+      message.success("Товар удалён");
+      fetchProducts(categoryId);
+    } catch (error) {
+      message.error("Ошибка при удалении товара");
+    }
+  };
+
   if (loading) {
     return (
       <div style={{
@@ -87,6 +99,19 @@ const ProductList = () => {
                   />
                 </div>
               ))}
+              {isAdmin && (
+                <Space style={{ marginTop: 16 }}>
+                  <Button type="primary" onClick={() => navigate(`/products/update/${product.id}`)}>Изменить</Button>
+                  <Popconfirm
+                    title="Удалить этот товар?"
+                    onConfirm={() => handleDelete(product.id)}
+                    okText="Да"
+                    cancelText="Нет"
+                  >
+                    <Button danger>Удалить</Button>
+                  </Popconfirm>
+                </Space>
+              )}
             </Card>
           </Col>
         ))}

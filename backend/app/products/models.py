@@ -4,8 +4,8 @@ from app.database import Base, str_uniq, int_pk, str_null_true
 from datetime import date
 
 characteristic_producttype = Table('charsproducttyperelation', Base.metadata,
-            Column('char_id', Integer, ForeignKey('characteristics.id')),
-            Column('producttype_art', Integer, ForeignKey('producttypes.art'))
+            Column('char_id', Integer, ForeignKey('characteristics.id', ondelete="CASCADE")),
+            Column('producttype_art', Integer, ForeignKey('producttypes.art', ondelete="CASCADE"))
                                 )
 
 
@@ -22,7 +22,8 @@ class Product(Base):
     
     product_types: Mapped[list['ProductType']] = relationship('ProductType',
                                                         back_populates='product',
-                                                        cascade="all, delete-orphan")
+                                                        cascade="all, delete-orphan",
+                                                        passive_deletes=True)
     
     def __str__(self):
         return (f"{self.__class__.__name__}(id={self.id}, "
@@ -59,7 +60,7 @@ class ProductType(Base):
     amount: Mapped[int]
     price: Mapped[float]
 
-    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id', ondelete="CASCADE"), nullable=False)
 
     product: Mapped['Product'] = relationship('Product', 
                                             back_populates='product_types')
