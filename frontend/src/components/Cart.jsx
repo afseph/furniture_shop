@@ -20,6 +20,8 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   useEffect(() => {
     if (isAuth) {
       fetchCart();
@@ -27,6 +29,13 @@ const Cart = () => {
       setLoading(false);
     }
   }, [isAuth]);
+
+  const msg = (type, content) => {
+    messageApi.open({
+      type,
+      content,
+    });
+  };
 
   const fetchCart = () => {
     setLoading(true);
@@ -55,19 +64,38 @@ const Cart = () => {
   };
 
   // TODO:
-  const handleOrder = () => {
+  const handleOrder = async () => {
     setSubmitting(true);
-    axios
-      .post("/orders/create/")
-      .then(() => {
-        message.success("Заказ успешно оформлен");
-        setCartItems([]);
-      })
-      .catch(() => {
-        message.error("Не удалось оформить заказ");
-      })
-      .finally(() => setSubmitting(false));
+    try {
+      const { data: allProducts } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/products/types/all/`
+      );
+  
+      // Проверяем наличие по art
+      const insufficientItems = cartItems.filter((cartItem) => {
+        const art = cartItem.product_type.art;
+        const product = allProducts.find((p) => p.art === art);
+        return !product || product.amount < cartItem.quantity;
+      });
+
+
+      if (insufficientItems.length > 0) {
+        msg('error', "Некоторые товары отсутствуют на складе или недостаточное количество")
+        return;
+      }
+  
+      // ! await axios.post(`${process.env.REACT_APP_API_URL}/orders/create/`);
+      msg('success', "Заказ успешно оформлен");
+      setCartItems([]);
+    } catch (error) {
+      console.error("Ошибка при оформлении заказа:", error);
+      msg('error', "Не удалось оформить заказ");
+    } finally {
+      setSubmitting(false);
+    }
   };
+  
+  
 
   const totalSum = cartItems.reduce(
     (sum, item) => sum + item.product_type.price * item.quantity,
@@ -95,6 +123,7 @@ const Cart = () => {
 
   return (
     <div style={{ padding: 24 }}>
+      {contextHolder}
       <Title level={3}>Ваша корзина</Title>
       <List
         grid={{ gutter: 16, column: 1 }}
