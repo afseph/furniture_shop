@@ -70,14 +70,24 @@ class UserProductItemDAO(BaseDAO):
     @classmethod
     async def create_order_from_cart(cls, user_id: int):
         async with async_session_maker() as session:
-            cart_items = await session.scalars(
-                select(cls.model)
-                .options(joinedload(cls.model.product_type))
-                .where(cls.model.user_id == user_id, cls.model.order_id == None)
-            )
+            cart_items_result = await session.execute(
+                    select(cls.model)
+                    .options(
+                        joinedload(cls.model.product_type).joinedload(ProductType.characteristics)
+                    )
+                    .where(cls.model.user_id == user_id, cls.model.order_id == None)
+                )
+            cart_items = cart_items_result.unique().scalars().all()
             cart_items = list(cart_items)
             if not cart_items:
                 raise ValueError("Cart is empty")
+
+            # Проверка наличия достаточного количества товаров
+            for item in cart_items:
+                if item.quantity > item.product_type.amount:
+                    raise ValueError(
+                        f"Недостаточно товара (арт. {item.product_type.art}). В наличии: {item.product_type.amount}, требуется: {item.quantity}"
+                    )
 
             total_price = sum([item.quantity * item.product_type.price for item in cart_items])
 
@@ -89,17 +99,27 @@ class UserProductItemDAO(BaseDAO):
                 item.order_id = order.id
                 item.price_at_order = item.product_type.price
 
+                # Уменьшаем остаток товара
+                item.product_type.amount -= item.quantity
+                session.add(item.product_type)
+
             await session.commit()
-            # Eagerly reload order and its relationships to avoid lazy loading
+
+            # Подгружаем все нужные связи
             await session.refresh(order)
-            await session.execute(select(Order)
-                                .options(
-                                    joinedload(Order.items)
-                                    .joinedload(UserProductItem.product_type)
-                                    .joinedload(ProductType.characteristics)
-                                )
-                                .where(Order.id == order.id))
+            order_result = await session.execute(
+                select(Order)
+                .options(
+                    joinedload(Order.items)
+                    .joinedload(UserProductItem.product_type)
+                    .joinedload(ProductType.characteristics)
+                )
+                .where(Order.id == order.id)
+            )
+            order = order_result.unique().scalar_one()
+
             return order.to_dict()
+
 
     @classmethod
     async def get_user_orders(cls, user_id: int):
