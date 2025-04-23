@@ -137,16 +137,40 @@ class UserProductItemDAO(BaseDAO):
             return [order.to_dict() for order in orders]
         
     @classmethod
-    async def delete_order(cls, order_id:int, user_id: int):
+    async def delete_order(cls, order_id: int, user_id: int):
         async with async_session_maker() as session:
+            # Загружаем все товары заказа с их типами
+            result = await session.execute(
+                select(cls.model)
+                .options(joinedload(cls.model.product_type))
+                .where(cls.model.order_id == order_id)
+            )
+            items = result.unique().scalars().all()
+
+            if not items:
+                raise ValueError("Заказ не найден или уже удалён")
+
+            total_quantity = 0
+
+            for item in items:
+                total_quantity += item.quantity
+                # Восстановление остатка
+                item.product_type.amount += item.quantity
+                session.add(item.product_type)
+
+            # Удаляем все позиции заказа
             await session.execute(
                 delete(cls.model).where(cls.model.order_id == order_id)
             )
 
+            # Удаляем сам заказ
             await session.execute(
-                delete(Order).where(Order.id==order_id, Order.user_id == user_id)
+                delete(Order).where(Order.id == order_id, Order.user_id == user_id)
             )
 
             await session.commit()
 
-            return order_id
+            return {
+                'order_id': order_id,
+                'restored_quantity': total_quantity
+            }
