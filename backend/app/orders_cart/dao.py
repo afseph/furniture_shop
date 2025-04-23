@@ -90,10 +90,15 @@ class UserProductItemDAO(BaseDAO):
                 item.price_at_order = item.product_type.price
 
             await session.commit()
+            # Eagerly reload order and its relationships to avoid lazy loading
             await session.refresh(order)
-
-            # Load items for safety to_dict method usage
-            await session.refresh(order, attribute_names=['items'])
+            await session.execute(select(Order)
+                                .options(
+                                    joinedload(Order.items)
+                                    .joinedload(UserProductItem.product_type)
+                                    .joinedload(ProductType.characteristics)
+                                )
+                                .where(Order.id == order.id))
             return order.to_dict()
 
     @classmethod

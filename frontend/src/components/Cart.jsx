@@ -84,7 +84,7 @@ const Cart = () => {
         return;
       }
   
-      // ! await axios.post(`${process.env.REACT_APP_API_URL}/orders/create/`);
+      await axios.post(`${process.env.REACT_APP_API_URL}/orders/create/`);
       msg('success', "Заказ успешно оформлен");
       setCartItems([]);
     } catch (error) {
