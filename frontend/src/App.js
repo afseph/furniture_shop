@@ -13,6 +13,7 @@ import Profile from './pages/Profile.jsx';
 import CategoryCatalog from './pages/Catalog.jsx';
 import ProductList from './pages/Products.jsx';
 import Cart from './components/Cart.jsx';
+import OrdersManager from './pages/Orders.jsx';
 
 import ProductCreate from './admin_components/Products_creation.jsx';
 import ProductEdit from './admin_components/Products_update.jsx';
@@ -44,6 +45,7 @@ function App() {
             <Route path='/products/update/:productId' element={<PrivateRoute><ProductEdit /></PrivateRoute>}/>
             <Route path='/categories/create' element={<PrivateRoute><CategoryManager/></PrivateRoute>}/>
             <Route path='/cart' element={<Cart/>}/>
+            <Route path='/orders' element={<OrdersManager />}/>
           </Route>
         </Routes>
       </BrowserRouter>
