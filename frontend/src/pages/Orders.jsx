@@ -71,7 +71,7 @@ const OrdersManager = () => {
       key: "actions",
       render: (_, record) => (
         <Button danger onClick={() => showDeleteConfirm(record.id)}>
-        Удалить
+        Отменить
         </Button>
       ),
     },
@@ -84,10 +84,10 @@ const OrdersManager = () => {
             open={isModalVisible}
             onOk={handleDelete}
             onCancel={() => setIsModalVisible(false)}
-            okText="Удалить"
+            okText="Отменить"
             cancelText="Отмена"
             >
-            <p>Вы уверены, что хотите удалить заказ?</p>
+            <p>Вы уверены, что хотите отменить заказ?</p>
         </Modal>
       <h2 className="text-xl mb-4">Управление заказами</h2>
       <Table

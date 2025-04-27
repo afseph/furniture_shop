@@ -11,6 +11,7 @@ import {
   Popconfirm,
   message,
 } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -19,6 +20,7 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -84,7 +86,9 @@ const Cart = () => {
         return;
       }
   
-      await axios.post(`${process.env.REACT_APP_API_URL}/orders/create/`);
+      await axios.post(`${process.env.REACT_APP_API_URL}/orders/create/`).then((res)=>{
+        navigate('/orders');
+      });
       msg('success', "Заказ успешно оформлен");
       setCartItems([]);
     } catch (error) {

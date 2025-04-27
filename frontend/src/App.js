@@ -17,6 +17,7 @@ import OrdersManager from './pages/Orders.jsx';
 import ProductCreate from './admin_components/Products_creation.jsx';
 import ProductEdit from './admin_components/Products_update.jsx';
 import CategoryManager from './admin_components/Category_manager.jsx';
+import AdminOrders from './admin_components/Orders_manager.jsx';
 
 import PrivateRoute from './components/PrivateRoute.jsx';
 import AuthenticatedRoute from './components/AuthenticatedRoute.jsx';
@@ -72,6 +73,11 @@ function App() {
               <AuthenticatedRoute>
                 <OrdersManager />
               </AuthenticatedRoute>
+            } />
+            <Route path="/orders/manager" element={
+              <PrivateRoute>
+                <AdminOrders />
+              </PrivateRoute>
             } />
           </Route>
         </Routes>

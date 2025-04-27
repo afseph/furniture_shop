@@ -33,6 +33,20 @@ const Header = () => {
           )
         },
       ],
+    },
+    {
+      key: '3',
+      label: 'Заказы',
+      children: [
+        {
+          key: '4-1',
+          label: (
+            <a href="/orders/manager/">
+              Менеджер заказов.
+            </a>
+          )
+        },
+      ]
     }
   ];
 
