@@ -135,7 +135,90 @@ class UserProductItemDAO(BaseDAO):
             orders = result.unique().scalars().all()
 
             return [order.to_dict() for order in orders]
-        
+    
+
+    @classmethod
+    async def get_all_orders(cls):
+        async with async_session_maker() as session:
+            result = await session.execute(
+                select(Order)
+                .options(
+                    joinedload(Order.items)
+                    .joinedload(UserProductItem.product_type)
+                    .joinedload(ProductType.characteristics)
+                )
+                .order_by(Order.created_at.desc())
+            )
+            orders = result.unique().scalars().all()
+            return [order.to_dict() for order in orders]
+    
+
+    @classmethod
+    async def admin_delete_order(cls, order_id: int):
+        async with async_session_maker() as session:
+            # Загружаем все товары в заказе вместе с их типами
+            result = await session.execute(
+                select(cls.model)
+                .options(joinedload(cls.model.product_type))
+                .where(cls.model.order_id == order_id)
+            )
+            items = result.unique().scalars().all()
+
+            if not items:
+                raise ValueError("Заказ не найден или уже удалён")
+
+            total_quantity = 0
+
+            for item in items:
+                total_quantity += item.quantity
+                # Восстанавливаем остаток товара
+                item.product_type.amount += item.quantity
+                session.add(item.product_type)
+
+            # Удаляем все позиции заказа
+            await session.execute(
+                delete(cls.model).where(cls.model.order_id == order_id)
+            )
+
+            # Удаляем сам заказ
+            await session.execute(
+                delete(Order).where(Order.id == order_id)
+            )
+
+            await session.commit()
+
+            return {
+                'order_id': order_id,
+                'restored_quantity': total_quantity,
+                'message': 'Order successfully deleted by admin'
+            }
+
+
+    @classmethod
+    async def admin_update_order_status(cls, order_id: int, new_status: str):
+        async with async_session_maker() as session:
+            result = await session.execute(
+                select(Order).where(Order.id == order_id)
+            )
+            order = result.scalar_one_or_none()
+
+            if not order:
+                raise ValueError("Заказ не найден")
+
+            # Обновляем статус
+            order.status = new_status
+
+            session.add(order)
+            await session.commit()
+            await session.refresh(order)
+
+            return {
+                'order_id': order.id,
+                'new_status': order.status,
+                'message': 'Order status updated successfully'
+            }
+
+
     @classmethod
     async def delete_order(cls, order_id: int, user_id: int):
         async with async_session_maker() as session:
