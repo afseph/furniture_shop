@@ -10,10 +10,10 @@ import { checkAdmin } from '../actions/auth.js';
 const Layout = ({ load_user, load_categories, checkAdmin }) => {
 
     useEffect(() => {
+        checkAdmin();
         load_user();
         load_categories();
-        checkAdmin();
-    },[]);
+    },[load_user, load_categories, checkAdmin]);
     
     return (
         <>

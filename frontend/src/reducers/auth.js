@@ -14,10 +14,11 @@ import {
 
 const initialState = {
     isAuthenticated: null,
-    isAdmin:false,
+    isAdmin:null,
     email: '',
     first_name: '',
-    phone_number: ''
+    phone_number: '',
+    loading: true
 };
 
 export default function(state = initialState, action) {
@@ -37,37 +38,43 @@ export default function(state = initialState, action) {
         case REGISTER_SUCCESS:
             return {
                 ...state, 
-                isAuthenticated: false
+                isAuthenticated: false,
+                loading: false
             }
         case LOAD_USER_PROFILE_SUCCESS:
             return{
                 ...state,
-                isAuthenticated: true
+                isAuthenticated: true,
+                loading: false
             }
         case LOGIN_SUCCESS:
             return {
                 ...state,
                 isAuthenticated: true,
-                email: payload
+                email: payload,
+                loading: false
             }
         case LOGOUT_SUCCESS:
             return {
                 ...state,
                 isAuthenticated: false,
                 isAdmin: false,
-                email: ''
+                email: '',
+                loading: false
             }
         case DELETE_USER_SUCCESS:
             return {
                 ...state,
                 isAuthenticated: false,
-                email: ''
+                email: '',
+                loading: false
             }
         case REGISTER_FAIL:
         case LOGIN_FAIL: 
         case LOGOUT_FAIL:
         case DELETE_USER_FAIL:
-            return state
+            return {...state,
+                loading: false}
         default:
             return state
     };
