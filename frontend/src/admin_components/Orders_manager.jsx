@@ -10,7 +10,8 @@ const AdminOrders = () => {
   const [loading, setLoading] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
-  const [userIdFilter, setUserIdFilter] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+  const [phoneSearch, setPhoneSearch] = useState('');
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortOrder, setSortOrder] = useState('ascend');
   const [priceLimits, setPriceLimits] = useState([0, 10000]);
@@ -67,17 +68,27 @@ const AdminOrders = () => {
     if (statusFilter !== 'all') {
       data = data.filter(order => order.status === statusFilter);
     }
-    if (userIdFilter) {
-      data = data.filter(order => order.user_id.toString().includes(userIdFilter));
+    if (userSearch) {
+      data = data.filter(order => 
+        order.user?.first_name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+        order.user?.last_name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+        order.user?.email?.toLowerCase().includes(userSearch.toLowerCase())
+      );
+    }
+    if (phoneSearch) {
+      data = data.filter(order => 
+        order.user?.phone_number?.toLowerCase().includes(phoneSearch.toLowerCase())
+      );
     }
     data = data.filter(order => order.total_price >= priceRange[0] && order.total_price <= priceRange[1]);
     data.sort((a, b) => sortOrder === 'ascend' ? a.total_price - b.total_price : b.total_price - a.total_price);
     setFilteredOrders(data);
-  }, [statusFilter, userIdFilter, priceRange, sortOrder, orders]);
+  }, [statusFilter, userSearch, phoneSearch, priceRange, sortOrder, orders]);
 
   const resetFilters = () => {
     setStatusFilter('all');
-    setUserIdFilter('');
+    setUserSearch('');
+    setPhoneSearch('');
     setPriceRange(priceLimits);
     setSortOrder('ascend');
   };
@@ -97,9 +108,14 @@ const AdminOrders = () => {
       key: 'id',
     },
     {
-      title: 'ID пользователя',
-      dataIndex: 'user_id',
-      key: 'user_id',
+      title: 'Пользователь',
+      key: 'user',
+      render: (_, record) => record.user ? `${record.user.first_name} ${record.user.last_name} (${record.user.email})` : 'Нет данных',
+    },
+    {
+      title: 'Телефон',
+      key: 'phone',
+      render: (_, record) => record.user?.phone_number || 'Нет данных',
     },
     {
       title: 'Статус',
@@ -172,9 +188,14 @@ const AdminOrders = () => {
             <Option value="cancelled">Cancelled</Option>
           </Select>
           <Input
-            placeholder="Фильтр по ID пользователя"
-            value={userIdFilter}
-            onChange={(e) => setUserIdFilter(e.target.value)}
+            placeholder="Поиск по имени или email пользователя"
+            value={userSearch}
+            onChange={(e) => setUserSearch(e.target.value)}
+          />
+          <Input
+            placeholder="Поиск по телефону"
+            value={phoneSearch}
+            onChange={(e) => setPhoneSearch(e.target.value)}
           />
           <div>
             <span>Диапазон цены:</span>
