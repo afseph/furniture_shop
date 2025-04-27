@@ -32,7 +32,7 @@ class UserProductItem(Base):
 
 class Order(Base):
     id: Mapped[int_pk]
-    user_id: Mapped[int]
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     status: Mapped[str] = mapped_column(default='new')
     total_price: Mapped[float] = mapped_column(default=0.0)
 
@@ -40,11 +40,14 @@ class Order(Base):
                          back_populates='order', 
                          cascade='all, delete-orphan')
     
+    user = relationship('User')
+    
     def to_dict(self):
         return{
             'id':self.id,
             'user_id': self.user_id,
             'status':self.status,
             'total_price': self.total_price,
+            'user': self.user.to_dict() if self.user else None,
             'items': [item.to_dict() for item in self.items]
         }

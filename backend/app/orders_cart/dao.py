@@ -143,6 +143,7 @@ class UserProductItemDAO(BaseDAO):
             result = await session.execute(
                 select(Order)
                 .options(
+                    joinedload(Order.user),
                     joinedload(Order.items)
                     .joinedload(UserProductItem.product_type)
                     .joinedload(ProductType.characteristics)
