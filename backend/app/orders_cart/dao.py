@@ -110,6 +110,7 @@ class UserProductItemDAO(BaseDAO):
             order_result = await session.execute(
                 select(Order)
                 .options(
+                    joinedload(Order.user),
                     joinedload(Order.items)
                     .joinedload(UserProductItem.product_type)
                     .joinedload(ProductType.characteristics)
@@ -126,7 +127,9 @@ class UserProductItemDAO(BaseDAO):
         async with async_session_maker() as session:
             result = await session.execute(
                 select(Order)
-                .options(joinedload(Order.items).joinedload(UserProductItem.product_type)
+                .options(
+                    joinedload(Order.user),
+                    joinedload(Order.items).joinedload(UserProductItem.product_type)
                          .joinedload(ProductType.characteristics))
                 .where(Order.user_id == user_id)
                 .order_by(Order.created_at.desc())
