@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     environment:
-      REACT_APP_API_URL: 'http://localhost:8000/api'
+      REACT_APP_API_URL: 'http://87.228.76.116:8000/api'
     depends_on:
       - backend
 
