@@ -12,8 +12,10 @@ services:
       - backend
 
   backend:
-    image: sephmr/seph-diplom-backend:latest
-    restart: always
+    build:
+      context: ./backend
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 80
+    command: ./start.sh
     ports:
       - 8000:80
     depends_on:
