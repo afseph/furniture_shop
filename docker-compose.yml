@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: sephmr/seph-diplom-frontend:latest
+    image: sephmr/sephmr-diplom-frontend:latest
     ports:
       - "80:80"
     environment:
@@ -11,7 +11,7 @@ services:
       - backend
 
   backend:
-    image: sephmr/seph-diplom-backend:latest
+    image: sephmr/sephmr-diplom-backend:latest
     restart: always
     ports:
       - 8000:80
