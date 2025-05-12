@@ -32,7 +32,8 @@ app = FastAPI(openapi_tags=tags_metadata)
 origins = [
     'http://localhost:3000',
     'http://localhost',
-    'http://87.228.76.116'
+    'http://87.228.76.116',
+    'http://87.228.76.116:8000'
 ]
 
 app.add_middleware(
