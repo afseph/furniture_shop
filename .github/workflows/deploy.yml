@@ -43,6 +43,5 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd furniture_shop
-          git pull
           docker-compose pull
           docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
