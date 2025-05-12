@@ -15,12 +15,14 @@ services:
     restart: always
     ports:
       - 8000:80
+    expose:
+      - 8000
     depends_on:
       migrator:
         condition: service_completed_successfully
 
   migrator:
-    build: sephmr/sephmr-diplom-backend:latest
+    image: sephmr/sephmr-diplom-backend:latest
     command: "alembic upgrade head"
     depends_on:
       db:

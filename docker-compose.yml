@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   frontend:
-    image: sephmr/sephmr-diplom-frontend:latest
+    build: 
+      context: ./frontend
     ports:
       - "80:80"
     environment:
@@ -11,7 +12,8 @@ services:
       - backend
 
   backend:
-    image: sephmr/sephmr-diplom-backend:latest
+    build: 
+      context: ./backend
     restart: always
     ports:
       - 8000:80
@@ -22,7 +24,8 @@ services:
         condition: service_completed_successfully
 
   migrator:
-    build: sephmr/sephmr-diplom-backend:latest
+    build: 
+      context: ./backend
     command: "alembic upgrade head"
     depends_on:
       db:
