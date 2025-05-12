@@ -22,7 +22,7 @@ services:
         condition: service_completed_successfully
 
   migrator:
-    build: ./backend
+    build: sephmr/sephmr-diplom-backend:latest
     command: "alembic upgrade head"
     depends_on:
       db:
