@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: sephmr/sephmr-diplom-frontend:latest
+    ports:
+      - "80:80"
+    environment:
+      REACT_APP_API_URL: 'http://87.228.76.116:8000/api'
+    depends_on:
+      - backend
+
+  backend:
+    image: sephmr/sephmr-diplom-backend:latest
+    restart: always
+    ports:
+      - 8000:80
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+
+  migrator:
+    build: sephmr/sephmr-diplom-backend:latest
+    command: "alembic upgrade head"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: fast_api_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d fast_api_db -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  pgdata:
+    driver: local
