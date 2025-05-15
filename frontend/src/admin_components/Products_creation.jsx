@@ -67,7 +67,7 @@ const ProductCreate = () => {
       msg('loading', 'Создание товара...');
 
       const productRes = await axios.post(
-        `${process.env.REACT_APP_API_URL}/products/add`,
+        `${process.env.REACT_APP_API_URL}/products/add/`,
         {
           title: values.title,
           description: values.description,
@@ -82,7 +82,7 @@ const ProductCreate = () => {
 
       for (const type of values.product_types) {
         const typeRes = await axios.post(
-          `${process.env.REACT_APP_API_URL}/products/types/add`,
+          `${process.env.REACT_APP_API_URL}/products/types/add/`,
           {
             product_id,
             art: type.art,
@@ -98,7 +98,7 @@ const ProductCreate = () => {
 
         for (const char of type.characteristics || []) {
           await axios.post(
-            `${process.env.REACT_APP_API_URL}/products/characteristic/add`,
+            `${process.env.REACT_APP_API_URL}/products/characteristic/add/`,
             {
               producttype_art: product_type_id,
               name: char.name,
