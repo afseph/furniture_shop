@@ -12,6 +12,14 @@ const CategoryManager = () => {
   const [editValue, setEditValue] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const msg = (type, content) => {
+    messageApi.open({
+      type: type,
+      content: content,
+    });
+  };
 
   // Получение категорий
   const fetchCategories = async () => {
@@ -48,8 +56,15 @@ const CategoryManager = () => {
   // Удаление категории
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API}/products/category/delete/${id}`);
-      message.success("Категория удалена");
+      await axios.delete(`${API}/products/category/delete/${id}`).then(
+        (response) => {
+          if (response.status === 204) {
+            msg("success", "Категория успешно удалена!");
+          } else {
+            msg("error", "Категория должна быть пустой!");
+          }
+        }
+      );
       fetchCategories();
     } catch (err) {
       message.error("Ошибка при удалении");
@@ -71,6 +86,7 @@ const CategoryManager = () => {
 
   return (
     <div style={{ display: "flex", gap: "2rem", padding: "2rem" }}>
+      {contextHolder}
       {/* Форма создания */}
       <div style={{ flex: 1 }}>
         <h2>Добавить категорию</h2>

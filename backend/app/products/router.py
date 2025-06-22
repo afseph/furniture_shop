@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import select 
 from app.database import async_session_maker 
 
@@ -239,7 +240,8 @@ async def delete_category(category_id: int) -> dict:
     try:
         check = await CategoryDAO.delete(id=category_id)
         if check:
-            return {"message": f"Категория с ID {category_id} удалена!"}
+            return JSONResponse(content={"message": f"Категория с ID {category_id} удалена!"},
+                                status_code=status.HTTP_204_NO_CONTENT)
         else:
             return {"message": "Ошибка при удалении категории!"}
     except:
