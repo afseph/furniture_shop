@@ -60,7 +60,7 @@ const CategoryManager = () => {
   const handleUpdate = async (id) => {
     if (!editValue.trim()) return;
     try {
-      await axios.put(`${API}/products/category/update`, { id, name: editValue });
+      await axios.put(`${API}`+"/products/category/update/", { id, name: editValue });
       message.success("Категория обновлена");
       setEditingId(null);
       fetchCategories();

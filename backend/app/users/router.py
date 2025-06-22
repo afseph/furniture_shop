@@ -79,6 +79,8 @@ async def update_user_first_name(new_name: SUserUpdateName,
     check = await UsersDAO.update(filter_by={"id":user_id}, 
                                   first_name = new_name.first_name)
     
+    print(check)
+    
     if check:
         return JSONResponse(content={'status':'success',
                 'message':'Имя пользователя успешно обновленно!', 

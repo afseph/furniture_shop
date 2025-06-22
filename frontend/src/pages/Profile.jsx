@@ -41,7 +41,7 @@ const Profile = () => {
     };
 
     const apiEndpoints = {
-        first_name: '/auth/update/name',
+        first_name: '/auth/update/name/',
         last_name: '/auth/update/lastname/',
         email: '/auth/update/email/',
         phone_number: '/auth/update/phone/',
